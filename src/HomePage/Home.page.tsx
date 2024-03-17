@@ -2,6 +2,9 @@ import React from "react";
 import useLocationStore from "../Zustand/LocationStore";
 import MapComponent from "./Map"; // Ensure this path is correct
 import { getElevation, getGeolocate } from "../API/GoogleFunctions";
+import Container from "../Components/Container";
+import RouteDropdown from "../Components/TypeDropdown";
+import LocationsList from "../Components/LocationsList";
 
 const HomePage = () => {
   const addLocation = useLocationStore((state) => state.addLocation);
@@ -14,11 +17,12 @@ const HomePage = () => {
       try {
         const elevation = await getElevation(latitude, longitude);
         const name = await getGeolocate(latitude, longitude);
-        const id = Date.now(); // Simple unique ID
+        const id = "ID" + Date.now(); // Simple unique ID
 
         addLocation({
           id,
           name,
+          visible: true,
           latitude,
           longitude,
           elevation,
@@ -30,11 +34,18 @@ const HomePage = () => {
   };
 
   return (
-    <div>
-      <h1>Home Page</h1>
-      <MapComponent onMapClick={handleMapClick} />
-      <p>Climate data for the world</p>
-    </div>
+    <Container>
+      <RouteDropdown defaultOption={"Home"} />
+
+      <MapComponent
+        onMapClick={handleMapClick}
+        mapContainerStyle={{
+          height: "70vh",
+          width: "100%",
+        }}
+      />
+      <LocationsList />
+    </Container>
   );
 };
 

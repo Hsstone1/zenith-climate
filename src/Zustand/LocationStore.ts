@@ -7,6 +7,7 @@ interface LocationStore {
     locations: Location[];
     addLocation: (location: Location) => void;
     removeLocation: (location: Location) => void;
+    toggleVisibility: (location: Location) => void;
 }
 
 const useLocationStore = create<LocationStore>((set) => ({
@@ -16,6 +17,14 @@ const useLocationStore = create<LocationStore>((set) => ({
     })),
     removeLocation: (location) => set((state) => ({
         locations: state.locations.filter((l) => l.id !== location.id),
+    })),
+    toggleVisibility: (location) => set((state) => ({
+        locations: state.locations.map((l) => {
+            if (l.id === location.id) {
+                return { ...l, visible: !l.visible };
+            }
+            return l;
+        }),
     })),
 }));
 

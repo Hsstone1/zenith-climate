@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar/Sidebar";
 import HomePage from "./HomePage/Home.page";
-import ComparePage from "./ComparePage/Compare.page";
+import AveragePage from "./AveragePage/Average.page";
 import HistoricalPage from "./HistoricalPage/Historical.page";
 import ClimateTrendsPage from "./TrendsPage/Trends.page";
 import ApiPage from "./ApiPage/Api.page";
@@ -59,9 +59,7 @@ function App() {
               zIndex: (theme) => theme.zIndex.drawer + 1,
             }}
           >
-            <Tooltip title={sidebarOpen ? "Close Sidebar" : "Open Sidebar"}>
-              {sidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </Tooltip>
+            {sidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
 
           {/* Adjust the Box component to take the full width and adjust padding or margin dynamically */}
@@ -69,19 +67,21 @@ function App() {
             component="main"
             sx={{
               flexGrow: 1,
-              p: 5,
-              marginLeft: sidebarOpen ? `${drawerWidth}px` : 0, // Dynamically adjust marginLeft based on sidebarOpen
+              p: 3,
+              width: sidebarOpen ? `calc(100vw - ${drawerWidth}px)` : "100vw", // Dynamically adjust width
+              marginLeft: sidebarOpen ? `${drawerWidth}px` : 0, // Keep your dynamic marginLeft
               transition: (theme) =>
-                theme.transitions.create("margin", {
+                theme.transitions.create(["margin", "width"], {
+                  // Adjust transition to include width
                   easing: theme.transitions.easing.sharp,
-                  duration: theme.transitions.duration.leavingScreen,
+                  duration: theme.transitions.duration.enteringScreen,
                 }),
             }}
           >
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<HomePage />} />
-              <Route path="/compare" element={<ComparePage />} />
+              <Route path="/average" element={<AveragePage />} />
               <Route path="/historical" element={<HistoricalPage />} />
               <Route path="/trends" element={<ClimateTrendsPage />} />
               <Route path="/api" element={<ApiPage />} />

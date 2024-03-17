@@ -3,11 +3,6 @@ import React from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import useLocationStore from "../Zustand/LocationStore"; // Adjust the path as necessary
 
-const mapContainerStyle = {
-  height: "70vh",
-  width: "100%",
-};
-
 const center = {
   lat: 34.397,
   lng: -100.644,
@@ -34,11 +29,12 @@ const options = {
   },
 };
 
-type MapComponentProps = {
+interface MapComponentProps {
   onMapClick: (e: google.maps.MapMouseEvent) => void;
-};
+  mapContainerStyle?: React.CSSProperties;
+}
 
-const MapComponent = ({ onMapClick }: MapComponentProps) => {
+const MapComponent = ({ onMapClick, mapContainerStyle }: MapComponentProps) => {
   const locations = useLocationStore((state) => state.locations);
 
   return (

@@ -2,23 +2,34 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Box, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
-import CompareIcon from "@mui/icons-material/Compare";
-import HistoryIcon from "@mui/icons-material/History";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendsIcon from "@mui/icons-material/TrendingUp";
 import ApiIcon from "@mui/icons-material/Api";
 import { Typography } from "@mui/material";
 
+import AverageIcon from "@mui/icons-material/BarChart";
+import HistoricalIcon from "@mui/icons-material/CalendarToday";
+import { containerColor } from "../exports";
+
 const Sidebar = () => (
   <Box>
-    <Typography
-      variant="h6"
-      component="div"
-      sx={{ flexGrow: 1, textAlign: "center" }}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
-      Peek Climate
-    </Typography>
+      <img
+        src={`${process.env.PUBLIC_URL}/logo512.jpg`}
+        alt="logo"
+        style={{ height: "50px", marginRight: "10px" }}
+      />
+      <Typography variant="h6" component="div">
+        Zenith Climate
+      </Typography>
+    </Box>
     <List>
-      {["Home", "Compare", "Historical", "Climate Trends", "API"].map(
+      {["Home", "Average", "Historical", "Climate Trends", "API"].map(
         (text, index) => (
           <ListItem
             button
@@ -28,9 +39,9 @@ const Sidebar = () => (
           >
             <ListItemIcon>
               {index === 0 && <HomeIcon />}
-              {index === 1 && <CompareIcon />}
-              {index === 2 && <HistoryIcon />}
-              {index === 3 && <TrendingUpIcon />}
+              {index === 1 && <AverageIcon />}
+              {index === 2 && <HistoricalIcon />}
+              {index === 3 && <TrendsIcon />}
               {index === 4 && <ApiIcon />}
             </ListItemIcon>
             <ListItemText primary={text} />
