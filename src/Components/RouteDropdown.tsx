@@ -9,17 +9,11 @@ import { useNavigate } from "react-router-dom"; // For navigation
 import Box from "@mui/material/Box"; // Importing Box for additional layout control
 import { dropdownOptions } from "../exports";
 
-interface DropdownOption {
-  label: string;
-  description: string;
-  value: string;
-}
-
-interface TypeDropdownProps {
+interface RouteDropdownProps {
   defaultOption?: string;
 }
 
-const TypeDropdown = ({ defaultOption }: TypeDropdownProps) => {
+const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string>(
@@ -90,4 +84,4 @@ const TypeDropdown = ({ defaultOption }: TypeDropdownProps) => {
   );
 };
 
-export default TypeDropdown;
+export default RouteDropdown;

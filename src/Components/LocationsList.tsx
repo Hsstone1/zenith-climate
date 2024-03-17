@@ -19,26 +19,27 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 import InfoIcon from "@mui/icons-material/Info";
+import useGeneralStore from "../Zustand/GeneralStore";
 
 const LocationsList = () => {
-  const { locations, removeLocation, toggleVisibility } = useLocationStore();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<Location | null>();
+  const {
+    locations,
+    removeLocation,
+    toggleVisibility,
+    selectedLocation,
+    setSelectedLocation,
+  } = useLocationStore();
   const [confirmDelete, setConfirmDelete] = useState<Location | null>();
+  const { isSidebarOpen, setIsSidebarOpen } = useGeneralStore();
 
   const handleInfoClick = (location: Location) => {
-    setCurrentLocation(location);
-    setIsDialogOpen(true);
-  };
-
-  const handleClose = () => {
-    setIsDialogOpen(false);
-    setCurrentLocation(null);
+    setSelectedLocation(location);
+    setIsSidebarOpen(true);
   };
 
   const handleDeleteClick = (location: Location) => {
     if (confirmDelete === location) {
-      removeLocation(location);
+      removeLocation(location.id);
       setConfirmDelete(null); // Reset after action
     } else {
       setConfirmDelete(location);
@@ -141,20 +142,6 @@ const LocationsList = () => {
               </Tooltip>
             )}
           </Box>
-          {isDialogOpen && currentLocation === location && (
-            <Dialog open={isDialogOpen} onClose={handleClose}>
-              <DialogTitle>{currentLocation.name}</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  {/* Provide your location overview stats and information here */}
-                  Location information and stats here.
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleClose}>Close</Button>
-              </DialogActions>
-            </Dialog>
-          )}
         </Box>
       ))}
     </Box>

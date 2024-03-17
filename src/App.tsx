@@ -11,22 +11,22 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import "./App.css";
 import { LoadScript } from "@react-google-maps/api";
+import useGeneralStore from "./Zustand/GeneralStore";
 import useLocationStore from "./Zustand/LocationStore";
-import { Tooltip } from "@mui/material";
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Start with the sidebar closed
-  const drawerWidth = 240; // Define the width of the drawer
+  const drawerWidth = 320; // Define the width of the drawer
   const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY || "";
+  const { isSidebarOpen, setIsSidebarOpen } = useGeneralStore();
   const { locations } = useLocationStore();
 
-  useEffect(() => {
-    console.log(locations);
-  }, [locations]);
-
   const handleDrawerToggle = () => {
-    setSidebarOpen(!sidebarOpen);
+    setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    console.log("Locations: ", locations);
+  }, [locations]);
 
   return (
     <LoadScript googleMapsApiKey={googleApiKey}>
@@ -35,11 +35,11 @@ function App() {
         <Box sx={{ display: "flex" }}>
           <Drawer
             variant="persistent"
-            open={sidebarOpen}
+            open={isSidebarOpen}
             sx={{
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: sidebarOpen ? drawerWidth : 0,
+                width: isSidebarOpen ? drawerWidth : 0,
                 boxSizing: "border-box",
               },
             }}
@@ -54,12 +54,12 @@ function App() {
             sx={{
               position: "fixed",
               top: "50%",
-              left: sidebarOpen ? drawerWidth : 0,
+              left: isSidebarOpen ? drawerWidth : 0,
               transform: "translateY(-50%)",
               zIndex: (theme) => theme.zIndex.drawer + 1,
             }}
           >
-            {sidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            {isSidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
 
           {/* Adjust the Box component to take the full width and adjust padding or margin dynamically */}
@@ -68,8 +68,8 @@ function App() {
             sx={{
               flexGrow: 1,
               p: 3,
-              width: sidebarOpen ? `calc(100vw - ${drawerWidth}px)` : "100vw", // Dynamically adjust width
-              marginLeft: sidebarOpen ? `${drawerWidth}px` : 0, // Keep your dynamic marginLeft
+              width: isSidebarOpen ? `calc(100vw - ${drawerWidth}px)` : "100vw", // Dynamically adjust width
+              marginLeft: isSidebarOpen ? `${drawerWidth}px` : 0, // Keep your dynamic marginLeft
               transition: (theme) =>
                 theme.transitions.create(["margin", "width"], {
                   // Adjust transition to include width

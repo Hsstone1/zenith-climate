@@ -1,3 +1,7 @@
+export const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+export const API_URL = process.env.REACT_APP_API_URL;
+export const S3_IMAGE_BUCKET_URL = process.env.REACT_APP_S3_IMAGE_BUCKET_URL;
+
 
 export interface Location {
     // Define the properties of a location
@@ -7,6 +11,10 @@ export interface Location {
     latitude: number;
     longitude: number;
     elevation: number;
+    average_data: any;
+    koppen: string;
+    hardiness: string;
+    isLoading: boolean,
 }
 
 export   const dropdownOptions = [

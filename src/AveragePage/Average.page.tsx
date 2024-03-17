@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Container from "../Components/Container";
-import RouteDropdown from "../Components/TypeDropdown";
+import RouteDropdown from "../Components/RouteDropdown";
 import LocationsList from "../Components/LocationsList";
 import ClimateDataList from "../Components/ClimateDataList";
 import { Box } from "@mui/system";
