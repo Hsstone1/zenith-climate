@@ -51,17 +51,51 @@ const Sidebar = () => {
   const gridData = selectedLocation
     ? [
         {
-          top: { Low: `${lowTemp}°F` },
-          bottom: { High: `${highTemp}°F` },
+          top: {
+            High: `${selectedLocation.average_data?.high_temperature?.annual.toFixed(
+              0
+            )}°F`,
+          },
+          bottom: {
+            Low: `${selectedLocation.average_data?.low_temperature?.annual.toFixed(
+              0
+            )}°F`,
+          },
         },
         {
-          top: { Comfort: comfortRating },
-          bottom: { Humidity: "30%" },
+          top: {
+            Rain: `${selectedLocation.average_data?.precipitation?.annual.toFixed(
+              0
+            )} in`,
+          },
+          bottom: {
+            Snow: `${selectedLocation.average_data?.snow?.annual.toFixed(
+              0
+            )} in`,
+          },
+        },
+        {
+          top: {
+            Comfort: `${selectedLocation.average_data?.comfort_index?.annual.toFixed(
+              0
+            )}%`,
+          },
+          bottom: {
+            Sun: `${selectedLocation.average_data?.sun?.annual.toFixed(0)}%`,
+          },
         },
 
         {
-          top: { Comfort: comfortRating },
-          bottom: { Humidity: "30%" },
+          top: {
+            Humidity: `${selectedLocation.average_data?.mean_humidity?.annual.toFixed(
+              0
+            )}%`,
+          },
+          bottom: {
+            Dewpoint: `${selectedLocation.average_data?.dewpoint?.annual.toFixed(
+              0
+            )}°F`,
+          },
         },
       ]
     : [];

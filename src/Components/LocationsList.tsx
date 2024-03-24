@@ -6,16 +6,9 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
+  ButtonBase,
   Box,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 import InfoIcon from "@mui/icons-material/Info";
@@ -32,12 +25,26 @@ const LocationsList = () => {
   const [confirmDelete, setConfirmDelete] = useState<Location | null>();
   const { isSidebarOpen, setIsSidebarOpen } = useGeneralStore();
 
-  const handleInfoClick = (location: Location) => {
-    setSelectedLocation(location);
-    setIsSidebarOpen(true);
+  const handleInfoClick = (
+    event: React.MouseEvent<HTMLElement>,
+    location: Location
+  ) => {
+    event.stopPropagation();
+    // Check if the selected location is the same as the clicked one
+    if (selectedLocation && selectedLocation.id === location.id) {
+      setSelectedLocation(null); // Deselect the location
+      setIsSidebarOpen(false); // Close the sidebar
+    } else {
+      setSelectedLocation(location); // Set the clicked location as selected
+      setIsSidebarOpen(true); // Open the sidebar
+    }
   };
 
-  const handleDeleteClick = (location: Location) => {
+  const handleDeleteClick = (
+    event: React.MouseEvent<HTMLElement>,
+    location: Location
+  ) => {
+    event.stopPropagation(); // Prevents the ButtonBase onClick from being called
     if (confirmDelete === location) {
       removeLocation(location.id);
       setConfirmDelete(null); // Reset after action
@@ -46,7 +53,9 @@ const LocationsList = () => {
     }
   };
 
-  const handleCancelDelete = () => {
+  const handleCancelDelete = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation(); // Prevents the ButtonBase onClick from being called
+
     setConfirmDelete(null);
   };
 
@@ -63,26 +72,33 @@ const LocationsList = () => {
       }}
     >
       {locations.map((location) => (
-        <Box
+        <ButtonBase
           key={location.id}
           sx={{
-            border: 1,
-            borderColor: "divider",
+            border: 2,
+            borderColor: location.isLoading
+              ? "error.main"
+              : location.visible
+              ? "primary.main"
+              : "divider", // Conditional borderColor
             px: 1,
             mx: 1,
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",
+            alignItems: "center", // Align items to center
             borderRadius: "1rem",
-            backgroundColor: "background.paper",
+
+            width: "fit-content",
           }}
+          onClick={() => toggleVisibility(location)}
         >
           <Typography
             variant="body1"
             gutterBottom
             noWrap
             sx={{
-              width: "150px",
+              width: "15vw",
+              minWidth: "125px",
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
@@ -90,59 +106,50 @@ const LocationsList = () => {
             {location.name}
           </Typography>
           <Box
-            sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center", // Center the icons
+            }}
           >
-            <Tooltip
-              title={location.visible ? "Hide Location" : "Show Location"}
-            >
-              <IconButton
-                onClick={() => toggleVisibility(location)}
-                size="small"
-              >
-                {location.visible ? (
-                  <VisibilityIcon color="action" />
-                ) : (
-                  <VisibilityOffIcon />
-                )}
-              </IconButton>
-            </Tooltip>
             <Tooltip title="Location Info">
               <IconButton
-                onClick={() => handleInfoClick(location)}
+                onClick={(e) => handleInfoClick(e, location)}
                 size="small"
+                sx={{
+                  color:
+                    selectedLocation && selectedLocation.id === location.id
+                      ? "blue"
+                      : "inherit",
+                }}
               >
                 <InfoIcon />
               </IconButton>
             </Tooltip>
-            {confirmDelete === location ? (
-              <Tooltip title="Confirm Delete">
-                <IconButton
-                  onClick={() => handleDeleteClick(location)}
-                  color="error"
-                  size="small"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Delete Location">
-                <IconButton
-                  onClick={() => setConfirmDelete(location)}
-                  size="small"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+            <Tooltip
+              title={
+                confirmDelete === location
+                  ? "Confirm Delete"
+                  : "Delete Location"
+              }
+            >
+              <IconButton
+                onClick={(e) => handleDeleteClick(e, location)}
+                color={confirmDelete === location ? "error" : "inherit"}
+                size="small"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
             {confirmDelete === location && (
               <Tooltip title="Cancel Delete">
-                <IconButton onClick={handleCancelDelete} size="small">
+                <IconButton onClick={(e) => handleCancelDelete(e)} size="small">
                   <DoNotDisturbOnIcon />
                 </IconButton>
               </Tooltip>
             )}
           </Box>
-        </Box>
+        </ButtonBase>
       ))}
     </Box>
   );

@@ -1,12 +1,14 @@
 // MapComponent.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { GoogleMap, Marker, OverlayView } from "@react-google-maps/api";
-import { CircularProgress, IconButton } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import { CircularProgress, IconButton } from "@mui/material";
+// import InfoIcon from "@mui/icons-material/Info";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import useLocationStore from "../Zustand/LocationStore"; // Adjust the path as necessary
 import useGeneralStore from "../Zustand/GeneralStore";
+import CustomMarker from "./CustomMarker"; // Import the 'CustomMarker' component from the appropriate module
 
+import { Location } from "../exports";
 const center = {
   lat: 34.397,
   lng: -100.644,
@@ -45,9 +47,21 @@ interface MapComponentProps {
 }
 
 const MapComponent = ({ onMapClick, mapContainerStyle }: MapComponentProps) => {
-  const { locations, removeLocation } = useLocationStore();
   const { mapInstance, setMapInstance } = useGeneralStore();
 
+  const { locations, removeLocation, setSelectedLocation } = useLocationStore();
+  const { isSidebarOpen, setIsSidebarOpen } = useGeneralStore();
+
+  const handleInfoButtonClick = (e: any, location: Location) => {
+    e.stopPropagation(); // Prevent event from bubbling up to the map
+    setSelectedLocation(location);
+    setIsSidebarOpen(true);
+  };
+
+  const handleDeteleButtonClick = (e: any, location: Location) => {
+    e.stopPropagation(); // Prevent event from bubbling up to the map
+    removeLocation(location.id);
+  };
   return (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
@@ -58,6 +72,14 @@ const MapComponent = ({ onMapClick, mapContainerStyle }: MapComponentProps) => {
       onLoad={(map) => setMapInstance(map)}
     >
       {locations.map((location) => (
+        <CustomMarker
+          key={location.id}
+          position={{ lat: location.latitude, lng: location.longitude }}
+          onClick={() => console.log("Marker clicked!")}
+        />
+      ))}
+
+      {/* {locations.map((location) => (
         <>
           <Marker
             key={location.id}
@@ -108,13 +130,17 @@ const MapComponent = ({ onMapClick, mapContainerStyle }: MapComponentProps) => {
               >
                 <span>{location.name}</span>
                 <div>
-                  <IconButton aria-label="info" size="small">
+                  <IconButton
+                    aria-label="info"
+                    size="small"
+                    onClick={(e) => handleInfoButtonClick(e, location)}
+                  >
                     <InfoIcon />
                   </IconButton>
                   <IconButton
                     aria-label="delete"
                     size="small"
-                    onClick={() => removeLocation(location.id)}
+                    onClick={(e) => handleDeteleButtonClick(e, location)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -123,7 +149,7 @@ const MapComponent = ({ onMapClick, mapContainerStyle }: MapComponentProps) => {
             </OverlayView>
           )}
         </>
-      ))}
+      ))} */}
     </GoogleMap>
   );
 };

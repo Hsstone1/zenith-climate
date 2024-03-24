@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../Components/Container";
 import RouteDropdown from "../Components/RouteDropdown";
 import LocationsList from "../Components/LocationsList";
@@ -13,19 +13,56 @@ import RainIcon from "@mui/icons-material/Grain";
 import SnowIcon from "@mui/icons-material/AcUnit";
 import SunIcon from "@mui/icons-material/WbSunny";
 import WindIcon from "@mui/icons-material/Air";
+import useLocationStore from "../Zustand/LocationStore";
+import TemperatureChart from "./TemperatureChart";
+
+interface AggregatedData {
+  [key: string]: number[];
+}
+
 const AveragePage = () => {
+  const { locations } = useLocationStore();
+
+  const aggregateVisibleLocationData = (fields: string[]) => {
+    const aggregatedData: {}[] = [];
+
+    locations.forEach((location) => {
+      if (location.visible) {
+        // Initialize an object to store the daily data for the current visible location
+        const locationData: { [key: string]: any } = {};
+
+        fields.forEach((field) => {
+          // Extract the 'daily' data for the current field
+          const dailyData = location.average_data[field]?.daily;
+
+          // Add this data to the locationData object under the field name
+          locationData[field] = dailyData;
+        });
+
+        // Add the populated locationData object to the aggregatedData array
+        aggregatedData.push(locationData);
+      }
+    });
+
+    return aggregatedData;
+  };
+
+  // const dataTypeOptions = [
+  //   { label: "Temperature", value: "temperature", Icon: TemperatureIcon },
+  //   { label: "Rain", value: "rain", Icon: RainIcon },
+  //   { label: "Snow", value: "snow", Icon: SnowIcon },
+  //   { label: "Sun", value: "sun", Icon: SunIcon },
+  //   { label: "Humidity", value: "humidity", Icon: HumidityIcon },
+  //   { label: "Comfort", value: "comfort", Icon: ComfortIcon },
+  // ];
+
   const dataTypeOptions = [
-    { label: "Temperature", value: "temperature", Icon: TemperatureIcon },
-    { label: "Apparent", value: "apparent", Icon: TemperatureIcon },
-    { label: "Rain", value: "rain", Icon: RainIcon },
-    { label: "Snow", value: "snow", Icon: SnowIcon },
-    { label: "Sun", value: "sun", Icon: SunIcon },
-    { label: "UV Index", value: "UV", Icon: SunIcon },
-    { label: "Humidity", value: "humidity", Icon: HumidityIcon },
-    { label: "Dew Point", value: "dewPoint", Icon: HumidityIcon },
-    { label: "Wind", value: "wind", Icon: WindIcon },
-    { label: "Comfort", value: "comfort", Icon: ComfortIcon },
-    // Add more data types as needed
+    { label: "Temperature", value: "temperature" },
+    { label: "Rain", value: "rain" },
+    { label: "Snow", value: "snow" },
+    { label: "Sun", value: "sun" },
+    { label: "Humidity", value: "humidity" },
+    { label: "Comfort", value: "comfort" },
   ];
 
   const handleDataTypeSelect = (value: string) => {
@@ -33,6 +70,19 @@ const AveragePage = () => {
     // This could involve fetching data or updating the UI to show the selected type's data
     console.log("Selected data type:", value);
   };
+
+  const aggregatedData = aggregateVisibleLocationData([
+    "high_temperature",
+    "low_temperature",
+    "apparent_high_temperature",
+    "apparent_low_temperature",
+    "expected_max",
+    "expected_min",
+  ]);
+
+  useEffect(() => {
+    console.log("Aggregated data: ", aggregatedData);
+  }, [aggregatedData, locations]);
 
   return (
     <Container>
@@ -42,7 +92,9 @@ const AveragePage = () => {
         options={dataTypeOptions}
         onSelect={handleDataTypeSelect}
       />
-      <Box sx={{ height: "70%" }} />
+      <Box sx={{ height: "75%" }}>
+        <TemperatureChart aggregatedData={aggregatedData} />
+      </Box>
 
       <LocationsList />
     </Container>

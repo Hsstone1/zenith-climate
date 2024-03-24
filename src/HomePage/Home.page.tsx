@@ -3,6 +3,8 @@ import useLocationStore from "../Zustand/LocationStore";
 import MapComponent from "./Map"; // Ensure this path is correct
 import { getElevation, getGeolocate } from "../API/GoogleFunctions";
 import Container from "../Components/Container";
+import { Box } from "@mui/system";
+
 import RouteDropdown from "../Components/RouteDropdown";
 import LocationsList from "../Components/LocationsList";
 import { API_URL } from "../exports";
@@ -61,13 +63,16 @@ const HomePage = () => {
     <Container>
       <RouteDropdown defaultOption={"Home"} />
 
-      <MapComponent
-        onMapClick={handleMapClick}
-        mapContainerStyle={{
-          height: "70vh",
-          width: "100%",
-        }}
-      />
+      <Box sx={{ height: "80%" }}>
+        <MapComponent
+          onMapClick={handleMapClick}
+          mapContainerStyle={{
+            height: "70vh",
+            width: "100%",
+          }}
+        />
+      </Box>
+
       <LocationsList />
     </Container>
   );

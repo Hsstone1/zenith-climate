@@ -6,7 +6,7 @@ interface LocationStore {
     // Define the properties and methods of the store
     selectedLocation: Location | null;
     locations: Location[];
-    setSelectedLocation: (location: Location) => void;
+    setSelectedLocation: (selectedLocation: Location | null) => void;
     addLocation: (location: Location) => void;
     removeLocation: (id: string) => void;
     toggleVisibility: (location: Location) => void;
@@ -30,6 +30,7 @@ const useLocationStore = create<LocationStore>((set) => ({
         selectedLocation: state.selectedLocation && state.selectedLocation.id === id ? null : state.selectedLocation,
       })),
     toggleVisibility: (location) => set((state) => ({
+        
         locations: state.locations.map((l) => {
             if (l.id === location.id) {
                 return { ...l, visible: !l.visible };

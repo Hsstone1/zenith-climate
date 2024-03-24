@@ -45,7 +45,7 @@ const ClimateDataList = ({ options, onSelect }: DataTypeSelectionProps) => {
           }}
           variant="outlined"
           sx={{
-            minWidth: "10vw",
+            minWidth: "125px",
             width: "auto",
             textTransform: "none",
             color: "black",
@@ -57,7 +57,7 @@ const ClimateDataList = ({ options, onSelect }: DataTypeSelectionProps) => {
               borderColor: theme.palette.primary.dark,
             },
             borderRadius: "1rem",
-            m: 1, // Maintain constant margins
+            mx: 1, // Maintain constant margins
             display: "inline-flex",
             justifyContent: "center",
             alignItems: "center",

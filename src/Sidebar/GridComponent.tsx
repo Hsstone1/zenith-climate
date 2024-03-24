@@ -22,13 +22,13 @@ const GridComponent = ({ data }: GridComponentProps) => (
         >
           {Object.entries(top).map(([key, value], idx) => (
             <Typography
-              variant="body1"
+              variant="body2"
               key={idx}
             >{`${key}: ${value}`}</Typography>
           ))}
           {Object.entries(bottom).map(([key, value], idx) => (
             <Typography
-              variant="body1"
+              variant="body2"
               key={idx + 100}
             >{`${key}: ${value}`}</Typography>
           ))}

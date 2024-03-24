@@ -31,17 +31,8 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
-      <Typography
-        variant="h6"
-        component="div"
-        sx={{
-          mr: 1, // Adds a small margin to the right of the text for spacing
-        }}
-      >
-        {selected}
-      </Typography>
-      <Tooltip title="Select Option" placement="right">
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Tooltip title="Select Option" placement="bottom">
         <IconButton
           aria-controls="simple-menu"
           aria-haspopup="true"
@@ -80,6 +71,15 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
           </MenuItem>
         ))}
       </Menu>
+      <Typography
+        variant="h6"
+        component="div"
+        sx={{
+          mr: 1, // Adds a small margin to the right of the text for spacing
+        }}
+      >
+        {selected}
+      </Typography>
     </Box>
   );
 };
