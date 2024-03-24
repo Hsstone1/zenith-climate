@@ -23,15 +23,12 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Popover from "@mui/material/Popover";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
+import { getBackgroundColor } from "../colors";
 
 // Import your account section component
 
 const Sidebar = () => {
   // This state could come from your location selection logic
-
-  const [lowTemp, setLowTemp] = useState(20);
-  const [highTemp, setHighTemp] = useState(90);
-  const [comfortRating, setComfortRating] = useState(80);
 
   const { selectedLocation } = useLocationStore();
 
@@ -52,49 +49,85 @@ const Sidebar = () => {
     ? [
         {
           top: {
-            High: `${selectedLocation.average_data?.high_temperature?.annual.toFixed(
-              0
-            )}°F`,
+            High: {
+              value: `${selectedLocation.average_data?.high_temperature?.annual.toFixed(
+                0
+              )}°F`,
+              color: getBackgroundColor(
+                selectedLocation.average_data?.high_temperature?.annual,
+                "Temperature"
+              ), // Example color
+            },
           },
           bottom: {
-            Low: `${selectedLocation.average_data?.low_temperature?.annual.toFixed(
-              0
-            )}°F`,
+            Low: {
+              value: `${selectedLocation.average_data?.low_temperature?.annual.toFixed(
+                0
+              )}°F`,
+              color: getBackgroundColor(
+                selectedLocation.average_data?.low_temperature?.annual,
+                "Temperature"
+              ),
+            },
           },
         },
         {
           top: {
-            Rain: `${selectedLocation.average_data?.precipitation?.annual.toFixed(
-              0
-            )} in`,
+            Rain: {
+              value: `${selectedLocation.average_data?.precipitation?.annual.toFixed(
+                0
+              )} in`,
+              color: "#FF0000", // Example color
+            },
           },
           bottom: {
-            Snow: `${selectedLocation.average_data?.snow?.annual.toFixed(
-              0
-            )} in`,
-          },
-        },
-        {
-          top: {
-            Comfort: `${selectedLocation.average_data?.comfort_index?.annual.toFixed(
-              0
-            )}%`,
-          },
-          bottom: {
-            Sun: `${selectedLocation.average_data?.sun?.annual.toFixed(0)}%`,
+            Snow: {
+              value: `${selectedLocation.average_data?.snow?.annual.toFixed(
+                0
+              )} in`,
+              color: "#0000FF", // Example color
+            },
           },
         },
 
         {
           top: {
-            Humidity: `${selectedLocation.average_data?.mean_humidity?.annual.toFixed(
-              0
-            )}%`,
+            Comfort: {
+              value: `${selectedLocation.average_data?.comfort_index?.annual.toFixed(
+                0
+              )}%`,
+              color: "#FF0000", // Example color
+            },
           },
           bottom: {
-            Dewpoint: `${selectedLocation.average_data?.dewpoint?.annual.toFixed(
-              0
-            )}°F`,
+            Sun: {
+              value: `${selectedLocation.average_data?.sun?.annual.toFixed(
+                0
+              )}%`,
+              color: "#0000FF", // Example color
+            },
+          },
+        },
+
+        {
+          top: {
+            Humidity: {
+              value: `${selectedLocation.average_data?.mean_humidity?.annual.toFixed(
+                0
+              )}%`,
+              color: "#FF0000", // Example color
+            },
+          },
+          bottom: {
+            Dewpoint: {
+              value: `${selectedLocation.average_data?.dewpoint?.annual.toFixed(
+                0
+              )}°F`,
+              color: getBackgroundColor(
+                selectedLocation.average_data?.dewpoint?.annual,
+                "Temperature"
+              ),
+            },
           },
         },
       ]

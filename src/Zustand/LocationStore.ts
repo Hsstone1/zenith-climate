@@ -1,5 +1,5 @@
 // useStore.js
-import create from 'zustand';
+import {create} from 'zustand';
 import { Location } from '../exports';
 
 interface LocationStore {

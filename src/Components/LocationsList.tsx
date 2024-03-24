@@ -8,6 +8,7 @@ import {
   Tooltip,
   ButtonBase,
   Box,
+  GlobalStyles,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
@@ -33,7 +34,7 @@ const LocationsList = () => {
     // Check if the selected location is the same as the clicked one
     if (selectedLocation && selectedLocation.id === location.id) {
       setSelectedLocation(null); // Deselect the location
-      setIsSidebarOpen(false); // Close the sidebar
+      //setIsSidebarOpen(false); // Close the sidebar
     } else {
       setSelectedLocation(location); // Set the clicked location as selected
       setIsSidebarOpen(true); // Open the sidebar
@@ -60,98 +61,123 @@ const LocationsList = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        p: 1,
-        overflowX: "scroll", // Enable horizontal scrolling
-        "&::-webkit-scrollbar": {
-          display: "none",
-        },
-        scrollbarWidth: "none",
-      }}
-    >
-      {locations.map((location) => (
-        <ButtonBase
-          key={location.id}
-          sx={{
-            border: 2,
-            borderColor: location.isLoading
-              ? "error.main"
-              : location.visible
-              ? "primary.main"
-              : "divider", // Conditional borderColor
-            px: 1,
-            mx: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center", // Align items to center
-            borderRadius: "1rem",
+    <>
+      <GlobalStyles
+        styles={{
+          "@keyframes borderColorFade": {
+            "0%": {
+              borderColor: "#ff0000", // start color
+            },
+            "50%": {
+              borderColor: "#0000ff", // mid transition color
+            },
+            "100%": {
+              borderColor: "#ff0000", // end color
+            },
+          },
+        }}
+      />
 
-            width: "fit-content",
-          }}
-          onClick={() => toggleVisibility(location)}
-        >
-          <Typography
-            variant="body1"
-            gutterBottom
-            noWrap
+      <Box
+        sx={{
+          display: "flex",
+          p: 1,
+          overflowX: "scroll", // Enable horizontal scrolling
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          scrollbarWidth: "none",
+        }}
+      >
+        {locations.map((location) => (
+          <ButtonBase
+            key={location.id}
             sx={{
-              width: "15vw",
-              minWidth: "125px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {location.name}
-          </Typography>
-          <Box
-            sx={{
+              border: 2,
+              borderColor: location.isLoading
+                ? "error.main"
+                : location.visible
+                ? "primary.main"
+                : "divider", // Conditional borderColor
+              animation: location.isLoading
+                ? "borderColorFade 2s infinite"
+                : "none", // Apply animation if loading
+
+              px: 1,
+              mx: 1,
               display: "flex",
-              flexDirection: "row",
-              justifyContent: "center", // Center the icons
+              flexDirection: "column",
+              alignItems: "center", // Align items to center
+              borderRadius: "1rem",
+
+              width: "fit-content",
             }}
+            onClick={() => toggleVisibility(location)}
           >
-            <Tooltip title="Location Info">
-              <IconButton
-                onClick={(e) => handleInfoClick(e, location)}
-                size="small"
-                sx={{
-                  color:
-                    selectedLocation && selectedLocation.id === location.id
-                      ? "blue"
-                      : "inherit",
-                }}
-              >
-                <InfoIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip
-              title={
-                confirmDelete === location
-                  ? "Confirm Delete"
-                  : "Delete Location"
-              }
+            <Typography
+              variant="body1"
+              gutterBottom
+              noWrap
+              sx={{
+                width: "15vw",
+                minWidth: "125px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
             >
-              <IconButton
-                onClick={(e) => handleDeleteClick(e, location)}
-                color={confirmDelete === location ? "error" : "inherit"}
-                size="small"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-            {confirmDelete === location && (
-              <Tooltip title="Cancel Delete">
-                <IconButton onClick={(e) => handleCancelDelete(e)} size="small">
-                  <DoNotDisturbOnIcon />
+              {!location.isLoading ? location.name : "Loading..."}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center", // Center the icons
+              }}
+            >
+              <Tooltip title="Location Info">
+                <IconButton
+                  onClick={(e) => handleInfoClick(e, location)}
+                  size="small"
+                  sx={{
+                    color:
+                      selectedLocation && selectedLocation.id === location.id
+                        ? "blue"
+                        : "inherit",
+                  }}
+                >
+                  <InfoIcon />
                 </IconButton>
               </Tooltip>
-            )}
-          </Box>
-        </ButtonBase>
-      ))}
-    </Box>
+              <Tooltip
+                title={
+                  confirmDelete === location
+                    ? "Confirm Delete"
+                    : "Delete Location"
+                }
+              >
+                <IconButton
+                  onClick={(e) => handleDeleteClick(e, location)}
+                  color={confirmDelete === location ? "error" : "inherit"}
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+              {confirmDelete === location && (
+                <Tooltip title="Cancel Delete">
+                  <IconButton
+                    onClick={(e) => handleCancelDelete(e)}
+                    size="small"
+                  >
+                    <DoNotDisturbOnIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
+          </ButtonBase>
+        ))}
+      </Box>
+    </>
   );
 };
 

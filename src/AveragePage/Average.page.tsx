@@ -15,6 +15,7 @@ import SunIcon from "@mui/icons-material/WbSunny";
 import WindIcon from "@mui/icons-material/Air";
 import useLocationStore from "../Zustand/LocationStore";
 import TemperatureChart from "./TemperatureChart";
+import LocationColorsList from "./VisibleLocationColors";
 
 interface AggregatedData {
   [key: string]: number[];
@@ -92,8 +93,21 @@ const AveragePage = () => {
         options={dataTypeOptions}
         onSelect={handleDataTypeSelect}
       />
-      <Box sx={{ height: "75%" }}>
-        <TemperatureChart aggregatedData={aggregatedData} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between", // Ensures spaced layout
+          height: "75%", // Adjust this value based on your actual header/navigation height
+          overflow: "hidden", // Prevents children from overflowing
+        }}
+      >
+        <Box sx={{ flexGrow: 0, flexShrink: 0, m: 1 }}>
+          <LocationColorsList />
+        </Box>
+        <Box sx={{ flexGrow: 1, flexShrink: 1, overflow: "auto" }}>
+          <TemperatureChart aggregatedData={aggregatedData} />
+        </Box>
       </Box>
 
       <LocationsList />

@@ -8,6 +8,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom"; // For navigation
 import Box from "@mui/material/Box"; // Importing Box for additional layout control
 import { dropdownOptions } from "../exports";
+import GooglePlacesAutocomplete from "./GoogleAutocomplete";
 
 interface RouteDropdownProps {
   defaultOption?: string;
@@ -31,7 +32,7 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
+    <Box sx={{ display: "flex", alignItems: "center", height: "6vh" }}>
       <Tooltip title="Select Option" placement="bottom">
         <IconButton
           aria-controls="simple-menu"
@@ -80,6 +81,8 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
       >
         {selected}
       </Typography>
+
+      <GooglePlacesAutocomplete />
     </Box>
   );
 };

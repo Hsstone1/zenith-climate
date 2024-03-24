@@ -1,31 +1,10 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
-import { getColorForTemperatureF } from "../exports";
+import { chartColors, monthNames } from "../exports";
 import { getBackgroundColor } from "../colors";
 
 // Define a set of colors for the chart data
-const chartColors = ["#ADD8E6", "#FFC0CB", "#D8BFD8", "#FFE4E1", "#90EE90"];
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-const getColorForTemperature = (temperature: number) => {
-  if (temperature >= 90) return "#ff4500"; // Red
-  if (temperature >= 32 && temperature < 90) return "#6495ed"; // Blue
-  return "#800080"; // Purple for temperatures below 32
-};
 
 interface TemperatureChartProps {
   aggregatedData: any[];
@@ -100,7 +79,7 @@ const TemperatureChart = ({ aggregatedData }: TemperatureChartProps) => {
           data: expectedMinData,
           borderColor: color,
           borderWidth: 0,
-          backgroundColor: `${color}33`, // Light opacity fill between max and min
+          backgroundColor: `${color}20`, // Light opacity fill between max and min
           fill: "-1", // Fill to the previous dataset
           tension: 0.4,
         },
@@ -114,12 +93,15 @@ const TemperatureChart = ({ aggregatedData }: TemperatureChartProps) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: true,
+        display: false,
         position: "top",
       },
       title: {
         display: true,
-        text: "Temperature Chart",
+        text: "Annual Temperatures",
+        font: {
+          size: 16,
+        },
       },
       tooltip: {
         callbacks: {
