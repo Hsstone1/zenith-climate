@@ -77,7 +77,10 @@ const Sidebar = () => {
               value: `${selectedLocation.average_data?.precipitation?.annual.toFixed(
                 0
               )} in`,
-              color: "#FF0000", // Example color
+              color: getBackgroundColor(
+                selectedLocation.average_data?.precipitation?.annual / 12,
+                "Precip"
+              ),
             },
           },
           bottom: {
@@ -85,7 +88,10 @@ const Sidebar = () => {
               value: `${selectedLocation.average_data?.snow?.annual.toFixed(
                 0
               )} in`,
-              color: "#0000FF", // Example color
+              color: getBackgroundColor(
+                selectedLocation.average_data?.snow?.annual / 12,
+                "Precip"
+              ),
             },
           },
         },

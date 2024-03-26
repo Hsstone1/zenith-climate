@@ -34,10 +34,10 @@ export const dropdownOptions = [
 export const containerColor = "#f8f8f8";
 
 export const chartColors = [
-  "#8fcef7", // Darker version of #ADD8E6
+  "#0384fc", // Darker version of #ADD8E6
   "#f77f5e", // Darker version of #FFC0CB
-  "#baf589", // Darker version of #D8BFD8
-  "#c284e3", // Darker version of #FFE4E1
+  "#c284e3", // Darker version of #D8BFD8
+  "#ffee00", // Darker version of #FFE4E1
   "#f2d085", // Darker version of #90EE90
 ];
 export const monthNames = [
@@ -54,3 +54,16 @@ export const monthNames = [
   "Nov",
   "Dec",
 ];
+
+export const calculateSmoothedData = (data: any, smoothDays: number) => {
+  return data.map((_: any, i: any) => {
+    let start = i - Math.floor(smoothDays / 2);
+    let end = i + Math.floor(smoothDays / 2);
+    start = Math.max(start, 0);
+    end = Math.min(end, data.length - 1);
+    const segment = data.slice(start, end + 1);
+    const average =
+      segment.reduce((acc: any, val: any) => acc + val, 0) / segment.length;
+    return average;
+  });
+};

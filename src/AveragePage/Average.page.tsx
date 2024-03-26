@@ -16,6 +16,7 @@ import WindIcon from "@mui/icons-material/Air";
 import useLocationStore from "../Zustand/LocationStore";
 import TemperatureChart from "./TemperatureChart";
 import LocationColorsList from "./VisibleLocationColors";
+import PrecipChart from "./PrecipChart";
 
 interface AggregatedData {
   [key: string]: number[];
@@ -23,6 +24,7 @@ interface AggregatedData {
 
 const AveragePage = () => {
   const { locations } = useLocationStore();
+  const [selectedChart, setSelectedChart] = useState("temperature");
 
   const aggregateVisibleLocationData = (fields: string[]) => {
     const aggregatedData: {}[] = [];
@@ -70,9 +72,10 @@ const AveragePage = () => {
     // Handle the selection of data type here
     // This could involve fetching data or updating the UI to show the selected type's data
     console.log("Selected data type:", value);
+    setSelectedChart(value);
   };
 
-  const aggregatedData = aggregateVisibleLocationData([
+  const temperatureAggregatedData = aggregateVisibleLocationData([
     "high_temperature",
     "low_temperature",
     "apparent_high_temperature",
@@ -81,9 +84,29 @@ const AveragePage = () => {
     "expected_min",
   ]);
 
-  useEffect(() => {
-    console.log("Aggregated data: ", aggregatedData);
-  }, [aggregatedData, locations]);
+  const rainAggregatedData = aggregateVisibleLocationData([
+    "precipitation",
+    "precip_days",
+  ]);
+
+  const snowAggregatedData = aggregateVisibleLocationData([
+    "snow",
+    "snow_days",
+  ]);
+
+  const renderSelectedChart = () => {
+    switch (selectedChart) {
+      case "temperature":
+        return <TemperatureChart aggregatedData={temperatureAggregatedData} />;
+      case "rain":
+        return <PrecipChart aggregatedData={rainAggregatedData} type="Rain" />;
+      case "snow":
+        return <PrecipChart aggregatedData={snowAggregatedData} type="Snow" />;
+      // Add cases for other data types as necessary
+      default:
+        return <TemperatureChart aggregatedData={temperatureAggregatedData} />; // Default case if needed
+    }
+  };
 
   return (
     <Container>
@@ -106,7 +129,7 @@ const AveragePage = () => {
           <LocationColorsList />
         </Box>
         <Box sx={{ flexGrow: 1, flexShrink: 1, overflow: "auto" }}>
-          <TemperatureChart aggregatedData={aggregatedData} />
+          {renderSelectedChart()}
         </Box>
       </Box>
 

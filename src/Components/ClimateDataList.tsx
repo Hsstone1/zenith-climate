@@ -17,12 +17,12 @@ const ClimateDataList = ({ options, onSelect }: DataTypeSelectionProps) => {
   const [selected, setSelected] = useState<string>(options[0]?.value);
   const theme = useTheme();
 
-  useEffect(() => {
-    // Ensure the first option is selected and handled by default on initial render
-    if (options.length > 0) {
-      onSelect(options[0].value);
-    }
-  }, [options, onSelect]);
+  // useEffect(() => {
+  //   // Ensure the first option is selected and handled by default on initial render
+  //   if (options.length > 0) {
+  //     onSelect(options[0].value);
+  //   }
+  // }, [options, onSelect]);
 
   return (
     <Box

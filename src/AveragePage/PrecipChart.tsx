@@ -1,88 +1,71 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
 import { Chart } from "chart.js/auto";
-import { chartColors, monthNames } from "../exports";
+import { calculateSmoothedData, chartColors, monthNames } from "../exports";
 import { getBackgroundColor } from "../colors";
 import { extendedValuesPlugin } from "./ChartPlugins";
 
-// Define a set of colors for the chart data
 Chart.register(extendedValuesPlugin);
 
 interface ChartProps {
   aggregatedData: any[];
+  type: "Rain" | "Snow";
 }
-const TemperatureChart = ({ aggregatedData }: ChartProps) => {
+
+const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
   const datasets = aggregatedData
     .map((locationData, index) => {
       const color = chartColors[index % chartColors.length];
+      // Calculate the smoothed data for precipLineData
+      let precipLineData = [];
+      let precipBarData = [];
+      const smoothDays = 14; // Days to average over
 
-      // High and Low Temperature dataset
-      const highTemperatureData = locationData.high_temperature || [];
-      const lowTemperatureData = locationData.low_temperature || [];
-
-      // Apparent High and Low Temperature dataset (dashed lines)
-      const apparentHighTemperatureData =
-        locationData.apparent_high_temperature || [];
-      const apparentLowTemperatureData =
-        locationData.apparent_low_temperature || [];
-
-      // Expected Max and Min Temperature dataset (fill)
-      const expectedMaxData = locationData.expected_max || [];
-      const expectedMinData = locationData.expected_min || [];
+      if (type === "Rain") {
+        precipLineData = calculateSmoothedData(
+          locationData.precipitation,
+          smoothDays
+        ).map((value: number) => value * 30);
+        precipBarData = calculateSmoothedData(
+          locationData.precip_days,
+          smoothDays
+        ).map((value: number) => value * 30);
+      } else {
+        precipLineData = calculateSmoothedData(
+          locationData.snow,
+          smoothDays
+        ).map((value: number) => value * 30);
+        precipBarData = calculateSmoothedData(
+          locationData.snow_days,
+          smoothDays
+        ).map((value: number) => value * 30);
+      }
 
       return [
         {
-          label: `High Temperature`,
-          data: highTemperatureData,
-          borderColor: color,
-          borderWidth: 2,
-          backgroundColor: "transparent",
-          tension: 0.8,
-        },
-        {
-          label: `Low Temperature`,
-          data: lowTemperatureData,
-          borderColor: color,
-          borderWidth: 2,
-          backgroundColor: "transparent",
-          tension: 0.8,
-        },
-        {
-          label: `Apparent High Temperature`,
-          data: apparentHighTemperatureData,
-          borderColor: color,
-          borderDash: [10, 5],
-          borderWidth: 0.5,
-          backgroundColor: "transparent",
-          tension: 0.4,
-        },
-        {
-          label: `Apparent Low Temperature`,
-          data: apparentLowTemperatureData,
-          borderColor: color,
-          borderDash: [10, 5],
-          borderWidth: 0.5,
+          type: "line",
 
+          label: `${type}`,
+          data: precipLineData,
+          borderColor: color,
+          borderWidth: 2,
           backgroundColor: "transparent",
           tension: 0.4,
+          yAxisID: "y", // Use the primary Y axis for the line
         },
-        {
-          label: `Expected Max Temperature`,
-          data: expectedMaxData,
-          borderColor: color,
-          borderWidth: 0,
-          backgroundColor: "transparent",
-          tension: 0.4,
-        },
-        {
-          label: `Expected Min Temperature`,
-          data: expectedMinData,
-          borderColor: color,
-          borderWidth: 0,
-          backgroundColor: `${color}20`, // Light opacity fill between max and min
-          fill: "-1", // Fill to the previous dataset
-          tension: 0.4,
-        },
+        // {
+        //   type: "line",
+        //   label: type == "Rain" ? `Rain Days` : `Snow Days`,
+        //   data: precipBarData.map((value: any, index: any) => ({
+        //     x: index + 1,
+        //     y: value,
+        //   })),
+        //   borderColor: color,
+        //   borderWidth: 0,
+        //   backgroundColor: `${color}50`,
+        //   fill: true,
+        //   yAxisID: "y1", // Use the secondary Y axis for the bars
+        // },
       ];
     })
     .flat();
@@ -99,7 +82,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
       },
       title: {
         display: true,
-        text: "Annual Temperatures",
+        text: type === "Rain" ? "Annual Rainfall" : "Annual Snowfall",
         font: {
           size: 16,
         },
@@ -118,13 +101,15 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
               label += ": ";
             }
             if (context.parsed.y !== null) {
-              label += `${context.parsed.y.toFixed(0)}°F`; // Append degree symbol and F for Fahrenheit
+              // Check if the label contains the word "day"
+              const unit = label.toLowerCase().includes("day") ? "days" : "in";
+              label += `${context.parsed.y.toFixed(0)} ${unit}`;
             }
             return label;
           },
           labelTextColor: function (context: any) {
-            const temperature = context.parsed.y;
-            return getBackgroundColor(temperature, "Temperature");
+            const precip = context.parsed.y;
+            return getBackgroundColor(precip / 12, "Precip");
           },
         },
       },
@@ -132,11 +117,26 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
 
     scales: {
       y: {
+        // Primary Y-axis for the line chart
         beginAtZero: true,
+        position: "left",
         ticks: {
-          // Append units to y-axis labels
           callback: function (value: any) {
-            return `${value}°F`; // Append degree symbol and F for Fahrenheit
+            return `${value} in`;
+          },
+        },
+      },
+      y1: {
+        // Secondary Y-axis for the bar chart
+        beginAtZero: true,
+        max: 30,
+        position: "right",
+        grid: {
+          drawOnChartArea: false, // Only show the grid for the left Y axis
+        },
+        ticks: {
+          callback: function (value: any) {
+            return `${value} days`; // Days of precipitation/snow
           },
         },
       },
@@ -181,6 +181,10 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
         },
       },
     },
+    interaction: {
+      mode: "nearest", // Replace "string" with one of the valid options
+      intersect: false,
+    },
 
     elements: {
       point: {
@@ -199,31 +203,10 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      {" "}
-      {/* Adjust the height as needed */}
-      <Line
-        options={{
-          ...options,
-          plugins: {
-            ...options.plugins,
-            legend: { ...options.plugins.legend, position: "top" },
-          },
-          interaction: {
-            mode: "nearest", // Replace "string" with one of the valid options
-            intersect: false,
-          },
-          scales: {
-            ...options.scales,
-            x: {
-              ...options.scales.x,
-              type: "linear",
-            },
-          },
-        }}
-        data={data}
-      />
+      {/* @ts-ignore */}
+      <Line options={options} data={{ labels, datasets }} />
     </div>
   );
 };
 
-export default TemperatureChart;
+export default PrecipChart;

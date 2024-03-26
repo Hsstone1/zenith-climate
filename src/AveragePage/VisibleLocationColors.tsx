@@ -6,9 +6,11 @@ import { chartColors } from "../exports";
 const LocationColorsList = () => {
   const { locations } = useLocationStore();
 
+  const visibleLocations = locations.filter((location) => location.visible);
+
   return (
     <Box sx={{ display: "flex", overflowX: "auto" }}>
-      {locations.map((location, index) => {
+      {visibleLocations.map((location, index) => {
         if (location.visible) {
           return (
             <Box
