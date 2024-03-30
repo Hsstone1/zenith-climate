@@ -67,13 +67,16 @@ function annotateValue(
   let unit = "";
   if (dataset.label.toLowerCase().includes("temperature")) {
     unit = "°F";
-  } else if (dataset.label.toLowerCase().includes("day")) {
-    unit = "days";
   } else if (
     dataset.label.toLowerCase().includes("snow") ||
     dataset.label.toLowerCase().includes("rain")
   ) {
     unit = "in";
+  } else if (
+    dataset.label.toLowerCase().includes("sun") ||
+    dataset.label.toLowerCase().includes("humidity")
+  ) {
+    unit = "%";
   }
   const text = `${value.toFixed(0)} ${unit}`;
 

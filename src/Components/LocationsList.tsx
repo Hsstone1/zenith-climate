@@ -127,54 +127,57 @@ const LocationsList = () => {
             >
               {!location.isLoading ? location.name : "Loading..."}
             </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center", // Center the icons
-              }}
-            >
-              {confirmDelete === location ? (
-                <Tooltip title="Cancel Delete">
-                  <IconButton
-                    onClick={(e) => handleCancelDelete(e)}
-                    size="small"
-                  >
-                    <DoNotDisturbOnIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Tooltip title="Location Info">
-                  <IconButton
-                    onClick={(e) => handleInfoClick(e, location)}
-                    size="small"
-                    sx={{
-                      color:
-                        selectedLocation && selectedLocation.id === location.id
-                          ? "blue"
-                          : "inherit",
-                    }}
-                  >
-                    <InfoIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              <Tooltip
-                title={
-                  confirmDelete === location
-                    ? "Confirm Delete"
-                    : "Delete Location"
-                }
+            {!location.isLoading && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center", // Center the icons
+                }}
               >
-                <IconButton
-                  onClick={(e) => handleDeleteClick(e, location)}
-                  color={confirmDelete === location ? "error" : "inherit"}
-                  size="small"
+                {confirmDelete === location ? (
+                  <Tooltip title="Cancel Delete">
+                    <IconButton
+                      onClick={(e) => handleCancelDelete(e)}
+                      size="small"
+                    >
+                      <DoNotDisturbOnIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Location Info">
+                    <IconButton
+                      onClick={(e) => handleInfoClick(e, location)}
+                      size="small"
+                      sx={{
+                        color:
+                          selectedLocation &&
+                          selectedLocation.id === location.id
+                            ? "blue"
+                            : "inherit",
+                      }}
+                    >
+                      <InfoIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip
+                  title={
+                    confirmDelete === location
+                      ? "Confirm Delete"
+                      : "Delete Location"
+                  }
                 >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+                  <IconButton
+                    onClick={(e) => handleDeleteClick(e, location)}
+                    color={confirmDelete === location ? "error" : "inherit"}
+                    size="small"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
           </ButtonBase>
         ))}
       </Box>

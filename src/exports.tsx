@@ -71,3 +71,43 @@ export const calculateSmoothedData = (data: any, smoothDays: number) => {
     return average;
   });
 };
+
+const koppenDescriptions: { [key: string]: string } = {
+  A: "Tropical/Megathermal climates",
+  Af: "Tropical rainforest climate, with no dry season.",
+  Am: "Tropical monsoon climate, with a short dry season.",
+  Aw: "Tropical savanna climate, with a winter dry season.",
+  Bsh: "Semi-arid (steppe) hot climate.",
+  Bsk: "Semi-arid (steppe) cold climate.",
+  Bwh: "Arid (desert) hot climate.",
+  Bwk: "Arid (desert) cold climate.",
+  C: "Temperate/Mesothermal climates",
+  Cfa: "Humid subtropical climate, with no dry season and a hot summer.",
+  Cfb: "Oceanic climate, with no dry season and a warm summer.",
+  Cfc: "Oceanic climate, with no dry season and a cold summer.",
+  Csa: "Mediterranean climate, with a dry and hot summer.",
+  Csb: "Mediterranean climate, with a dry and warm summer.",
+  Csc: "Mediterranean climate, with a dry and cold summer.",
+  Cwa: "Humid subtropical climate, with a dry winter and a hot summer.",
+  Cwb: "Humid subtropical climate, with a dry winter and a warm summer.",
+  Cwc: "Humid subtropical climate, with a dry winter and a cold summer.",
+  D: "Cold/Snow climates",
+  Dfa: "Humid continental climate, with no dry season and a hot summer.",
+  Dfb: "Humid continental climate, with no dry season and a warm summer.",
+  Dfc: "Subarctic climate, with no dry season and a cool summer.",
+  Dfd: "Subarctic climate, with no dry season and extremely cold winter.",
+  Dsa: "Cold semi-arid climate, with a dry summer and a hot summer.",
+  Dsb: "Cold semi-arid climate, with a dry summer and a warm summer.",
+  Dsc: "Cold semi-arid climate, with a dry summer and a cool summer.",
+  Dsd: "Cold semi-arid climate, with a dry summer and extremely cold winter.",
+  Dwa: "Humid continental climate, with a dry winter and a hot summer.",
+  Dwb: "Humid continental climate, with a dry winter and a warm summer.",
+  Dwc: "Subarctic climate, with a dry winter and a cool summer.",
+  Dwd: "Subarctic climate, with a dry winter and extremely cold winter.",
+  EF: "Ice cap climate, perpetually frozen with no true summer.",
+  ET: "Tundra climate, cold with slight warmth during short summers.",
+};
+
+export const getKoppenDescription = (koppenCode: string) => {
+  return koppenDescriptions[koppenCode] || "Unknown Koppen classification";
+};

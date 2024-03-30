@@ -23,7 +23,7 @@ const GridComponent = ({ data }: GridComponentProps) => (
             alignItems: "center",
             justifyContent: "center",
             height: "100%",
-            backgroundColor: "#ffffff",
+            backgroundColor: "gray",
           }}
         >
           {Object.entries(top).map(([key, { value, color }], idx) => (

@@ -18,6 +18,7 @@ import TemperatureChart from "./TemperatureChart";
 import LocationColorsList from "./VisibleLocationColors";
 import PrecipChart from "./PrecipChart";
 import SunChart from "./SunChart";
+import HumidityChart from "./HumidityChart";
 
 interface AggregatedData {
   [key: string]: number[];
@@ -66,8 +67,8 @@ const AveragePage = () => {
     { label: "Snow", value: "snow" },
     { label: "Sun", value: "sun" },
     { label: "Humidity", value: "humidity" },
-    { label: "Comfort", value: "comfort" },
-    { label: "Growing", value: "growing" },
+    //{ label: "Comfort", value: "comfort" },
+    //{ label: "Growing", value: "growing" },
   ];
 
   const handleDataTypeSelect = (value: string) => {
@@ -101,6 +102,11 @@ const AveragePage = () => {
     "sunlight_hours",
   ]);
 
+  const humidityAggregatedData = aggregateVisibleLocationData([
+    "mean_humidity",
+    "expected_max_dewpoint",
+  ]);
+
   const renderSelectedChart = () => {
     switch (selectedChart) {
       case "temperature":
@@ -111,6 +117,13 @@ const AveragePage = () => {
         return <PrecipChart aggregatedData={snowAggregatedData} type="Snow" />;
       case "sun":
         return <SunChart aggregatedData={sunAggregatedData} type="Sun" />;
+      case "humidity":
+        return (
+          <HumidityChart
+            aggregatedData={humidityAggregatedData}
+            type="Humidity"
+          />
+        );
       default:
         return <TemperatureChart aggregatedData={temperatureAggregatedData} />; // Default case if needed
     }

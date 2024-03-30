@@ -24,13 +24,15 @@ import Popover from "@mui/material/Popover";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { getBackgroundColor } from "../colors";
+import { Button } from "@mui/material";
+import { getKoppenDescription } from "../exports";
 
 // Import your account section component
 
 const Sidebar = () => {
   // This state could come from your location selection logic
 
-  const { selectedLocation } = useLocationStore();
+  const { selectedLocation, setSelectedLocation } = useLocationStore();
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -89,7 +91,7 @@ const Sidebar = () => {
                 0
               )} in`,
               color: getBackgroundColor(
-                selectedLocation.average_data?.snow?.annual / 12,
+                selectedLocation.average_data?.snow?.annual / (5 * 12),
                 "Precip"
               ),
             },
@@ -98,19 +100,26 @@ const Sidebar = () => {
 
         {
           top: {
-            Comfort: {
-              value: `${selectedLocation.average_data?.comfort_index?.annual.toFixed(
-                0
-              )}%`,
-              color: "#FF0000", // Example color
-            },
-          },
-          bottom: {
             Sun: {
               value: `${selectedLocation.average_data?.sun?.annual.toFixed(
                 0
               )}%`,
-              color: "#0000FF", // Example color
+              color: getBackgroundColor(
+                selectedLocation.average_data?.sun?.annual,
+                "Temperature"
+              ),
+            },
+          },
+          bottom: {
+            Hours: {
+              value: `${selectedLocation.average_data?.sunlight_hours?.annual.toFixed(
+                0
+              )}`,
+              color: getBackgroundColor(
+                selectedLocation.average_data?.sunlight_hours?.annual /
+                  (12 * 3.65),
+                "Temperature"
+              ),
             },
           },
         },
@@ -121,11 +130,14 @@ const Sidebar = () => {
               value: `${selectedLocation.average_data?.mean_humidity?.annual.toFixed(
                 0
               )}%`,
-              color: "#FF0000", // Example color
+              color: getBackgroundColor(
+                selectedLocation.average_data?.mean_humidity?.annual / 15,
+                "Precip"
+              ), // Example color
             },
           },
           bottom: {
-            Dewpoint: {
+            Dew: {
               value: `${selectedLocation.average_data?.dewpoint?.annual.toFixed(
                 0
               )}°F`,
@@ -141,11 +153,13 @@ const Sidebar = () => {
 
   const locationDetails = selectedLocation ? (
     <Box sx={{ p: 2 }}>
-      <img
-        src={`${process.env.PUBLIC_URL}/logo512.jpg`}
-        alt="Location"
-        style={{ width: "100%", borderRadius: "4px" }}
-      />
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <img
+          src={`${process.env.PUBLIC_URL}/climate-images/(${selectedLocation.koppen}).png`}
+          alt="Location Climate"
+          style={{ width: "100%", borderRadius: "4px" }}
+        />
+      </Box>
       <Typography
         variant="subtitle1"
         component="h2"
@@ -160,11 +174,20 @@ const Sidebar = () => {
       >{`Elevation: ${Math.round(
         selectedLocation.elevation
       )} Feet`}</Typography>
-      <Tooltip title="Cold semi-arid steppe climate" placement="right">
+      <Typography variant="body2" sx={{ color: "gray" }}>
+        {`Comfort: ${(
+          selectedLocation.average_data?.comfort_index?.annual / 10
+        ).toFixed(1)}/10`}
+      </Typography>
+      <Tooltip
+        title={`${getKoppenDescription(selectedLocation.koppen)}`}
+        placement="bottom"
+      >
         <Typography variant="body2" sx={{ color: "gray" }}>
           {`Climate Type: (${selectedLocation.koppen})`}
         </Typography>
       </Tooltip>
+
       <Divider sx={{ my: 2 }} />
       <GridComponent data={gridData} />
     </Box>
@@ -194,54 +217,77 @@ const Sidebar = () => {
 
   const accountSection = (
     <>
-      <IconButton onClick={handleAccountClick}>
-        <AccountCircleIcon />
-      </IconButton>
-      <Typography variant="h5">Account</Typography>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
+      <Button
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          p: 1,
+          width: "100%", // Ensure the button stretches to the container width
+          textTransform: "none", // Prevents the button from capitalizing your text
         }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
+        startIcon={<AccountCircleIcon />}
+        onClick={handleAccountClick} // Use the handleAccountClick to set the anchorEl
       >
-        <MenuItem onClick={handleClose}>Premium</MenuItem>
-        <MenuItem onClick={handleClose}>Preferences</MenuItem>
-        <MenuItem onClick={handleClose}>API</MenuItem>
-        <MenuItem onClick={handleClose}>Log Out</MenuItem>
-      </Popover>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          Account
+        </Typography>
+      </Button>
     </>
   );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <Box
+      <Button
+        component={Link}
+        to="/home"
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           p: 2,
+          width: "100%", // Ensure the button stretches to the container width
+          textTransform: "none", // Prevents the button from capitalizing your text
+        }}
+        startIcon={
+          <img
+            src={`${process.env.PUBLIC_URL}/logo512.jpg`}
+            alt="logo"
+            style={{ height: "30px", marginRight: "10px" }}
+          />
+        }
+        onClick={() => {
+          setSelectedLocation(null);
         }}
       >
-        <img
-          src={`${process.env.PUBLIC_URL}/logo512.jpg`}
-          alt="logo"
-          style={{ height: "50px", marginRight: "10px" }}
-        />
-        <Typography variant="h6">Zenith Climate</Typography>
-      </Box>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          Zenith Climate
+        </Typography>
+      </Button>
       <Divider />
       <Box sx={{ flexGrow: 1, overflow: "auto" }}>{locationDetails}</Box>
       <Divider />
       <Box sx={{ p: 1, display: "flex", justifyContent: "flex-start" }}>
         {accountSection}
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <MenuItem onClick={handleClose}>Premium</MenuItem>
+          <MenuItem onClick={handleClose}>Preferences</MenuItem>
+          <MenuItem onClick={handleClose}>API</MenuItem>
+          <MenuItem onClick={handleClose}>Log Out</MenuItem>
+        </Popover>
       </Box>
     </Box>
   );
