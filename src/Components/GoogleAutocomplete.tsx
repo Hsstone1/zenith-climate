@@ -71,13 +71,14 @@ const GooglePlacesAutocomplete = () => {
         ),
       }}
       sx={{
-        width: "20vw",
+        width: "25vw",
         maxWidth: "100%",
         alignContent: "center",
 
         m: 1,
         "& .MuiOutlinedInput-root": {
           borderRadius: "1rem", // Adjust for more or less rounding
+          backgroundColor: "white",
         },
         "& .MuiInputBase-input": {
           height: "1em", // Adjust the height of the input as needed

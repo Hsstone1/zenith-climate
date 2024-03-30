@@ -12,6 +12,27 @@ interface ChartProps {
   aggregatedData: any[];
 }
 const TemperatureChart = ({ aggregatedData }: ChartProps) => {
+  let globalMin = Math.min(
+    ...aggregatedData.flatMap((data) => [
+      ...data.high_temperature,
+      ...data.low_temperature,
+      ...data.apparent_high_temperature,
+      ...data.apparent_low_temperature,
+      ...data.expected_max,
+      ...data.expected_min,
+    ])
+  );
+  let globalMax = Math.max(
+    ...aggregatedData.flatMap((data) => [
+      ...data.high_temperature,
+      ...data.low_temperature,
+      ...data.apparent_high_temperature,
+      ...data.apparent_low_temperature,
+      ...data.expected_max,
+      ...data.expected_min,
+    ])
+  );
+
   const datasets = aggregatedData
     .map((locationData, index) => {
       const color = chartColors[index % chartColors.length];
@@ -38,6 +59,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
           borderWidth: 2,
           backgroundColor: "transparent",
           tension: 0.8,
+          yAxisID: "y",
         },
         {
           label: `Low Temperature`,
@@ -46,6 +68,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
           borderWidth: 2,
           backgroundColor: "transparent",
           tension: 0.8,
+          yAxisID: "y",
         },
         {
           label: `Apparent High Temperature`,
@@ -55,6 +78,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
           borderWidth: 0.5,
           backgroundColor: "transparent",
           tension: 0.4,
+          yAxisID: "y",
         },
         {
           label: `Apparent Low Temperature`,
@@ -65,6 +89,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
 
           backgroundColor: "transparent",
           tension: 0.4,
+          yAxisID: "y",
         },
         {
           label: `Expected Max Temperature`,
@@ -73,6 +98,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
           borderWidth: 0,
           backgroundColor: "transparent",
           tension: 0.4,
+          yAxisID: "y1",
         },
         {
           label: `Expected Min Temperature`,
@@ -82,6 +108,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
           backgroundColor: `${color}20`, // Light opacity fill between max and min
           fill: "-1", // Fill to the previous dataset
           tension: 0.4,
+          yAxisID: "y1",
         },
       ];
     })
@@ -133,6 +160,28 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
     scales: {
       y: {
         beginAtZero: true,
+        position: "left",
+        afterDataLimits: (axis: any) => {
+          axis.min = globalMin;
+          axis.max = globalMax;
+        },
+        ticks: {
+          // Append units to y-axis labels
+          callback: function (value: any) {
+            return `${value}°F`; // Append degree symbol and F for Fahrenheit
+          },
+        },
+      },
+      y1: {
+        beginAtZero: true,
+        position: "right",
+        afterDataLimits: (axis: any) => {
+          axis.min = globalMin;
+          axis.max = globalMax;
+        },
+        grid: {
+          drawOnChartArea: false, // Only show the grid for the left Y axis
+        },
         ticks: {
           // Append units to y-axis labels
           callback: function (value: any) {
@@ -142,6 +191,7 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
       },
       x: {
         type: "linear", // Ensure the axis is treated as linear
+        offset: false,
         ticks: {
           callback: function (value: any, index: any, ticks: any) {
             // Define the first day of each month in a leap year
@@ -187,6 +237,10 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
         radius: 0, // Optionally hide points
       },
     },
+    interaction: {
+      mode: "nearest", // Replace "string" with one of the valid options
+      intersect: false,
+    },
   };
 
   // Generate labels for all 366 days to ensure data for each day is plotted
@@ -199,31 +253,38 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      {" "}
-      {/* Adjust the height as needed */}
-      <Line
-        options={{
-          ...options,
-          plugins: {
-            ...options.plugins,
-            legend: { ...options.plugins.legend, position: "top" },
-          },
-          interaction: {
-            mode: "nearest", // Replace "string" with one of the valid options
-            intersect: false,
-          },
-          scales: {
-            ...options.scales,
-            x: {
-              ...options.scales.x,
-              type: "linear",
-            },
-          },
-        }}
-        data={data}
-      />
+      {/* @ts-ignore */}
+      <Line options={options} data={{ labels, datasets }} />
     </div>
   );
+
+  // return (
+  //   <div style={{ width: "100%", height: "100%" }}>
+  //     {" "}
+  //     {/* Adjust the height as needed */}
+  //     <Line
+  //       options={{
+  //         ...options,
+  //         plugins: {
+  //           ...options.plugins,
+  //           legend: { ...options.plugins.legend, position: "top" },
+  //         },
+  //         interaction: {
+  //           mode: "nearest", // Replace "string" with one of the valid options
+  //           intersect: false,
+  //         },
+  //         scales: {
+  //           ...options.scales,
+  //           x: {
+  //             ...options.scales.x,
+  //             type: "linear",
+  //           },
+  //         },
+  //       }}
+  //       data={data}
+  //     />
+  //   </div>
+  // );
 };
 
 export default TemperatureChart;

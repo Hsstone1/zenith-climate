@@ -17,6 +17,7 @@ import useLocationStore from "../Zustand/LocationStore";
 import TemperatureChart from "./TemperatureChart";
 import LocationColorsList from "./VisibleLocationColors";
 import PrecipChart from "./PrecipChart";
+import SunChart from "./SunChart";
 
 interface AggregatedData {
   [key: string]: number[];
@@ -94,6 +95,11 @@ const AveragePage = () => {
     "snow_days",
   ]);
 
+  const sunAggregatedData = aggregateVisibleLocationData([
+    "sun",
+    "sunlight_hours",
+  ]);
+
   const renderSelectedChart = () => {
     switch (selectedChart) {
       case "temperature":
@@ -102,7 +108,8 @@ const AveragePage = () => {
         return <PrecipChart aggregatedData={rainAggregatedData} type="Rain" />;
       case "snow":
         return <PrecipChart aggregatedData={snowAggregatedData} type="Snow" />;
-      // Add cases for other data types as necessary
+      case "sun":
+        return <SunChart aggregatedData={sunAggregatedData} type="Sun" />;
       default:
         return <TemperatureChart aggregatedData={temperatureAggregatedData} />; // Default case if needed
     }

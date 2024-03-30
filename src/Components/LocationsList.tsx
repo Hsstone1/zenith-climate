@@ -134,20 +134,31 @@ const LocationsList = () => {
                 justifyContent: "center", // Center the icons
               }}
             >
-              <Tooltip title="Location Info">
-                <IconButton
-                  onClick={(e) => handleInfoClick(e, location)}
-                  size="small"
-                  sx={{
-                    color:
-                      selectedLocation && selectedLocation.id === location.id
-                        ? "blue"
-                        : "inherit",
-                  }}
-                >
-                  <InfoIcon />
-                </IconButton>
-              </Tooltip>
+              {confirmDelete === location ? (
+                <Tooltip title="Cancel Delete">
+                  <IconButton
+                    onClick={(e) => handleCancelDelete(e)}
+                    size="small"
+                  >
+                    <DoNotDisturbOnIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Tooltip title="Location Info">
+                  <IconButton
+                    onClick={(e) => handleInfoClick(e, location)}
+                    size="small"
+                    sx={{
+                      color:
+                        selectedLocation && selectedLocation.id === location.id
+                          ? "blue"
+                          : "inherit",
+                    }}
+                  >
+                    <InfoIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
               <Tooltip
                 title={
                   confirmDelete === location
@@ -163,16 +174,6 @@ const LocationsList = () => {
                   <DeleteIcon />
                 </IconButton>
               </Tooltip>
-              {confirmDelete === location && (
-                <Tooltip title="Cancel Delete">
-                  <IconButton
-                    onClick={(e) => handleCancelDelete(e)}
-                    size="small"
-                  >
-                    <DoNotDisturbOnIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
             </Box>
           </ButtonBase>
         ))}

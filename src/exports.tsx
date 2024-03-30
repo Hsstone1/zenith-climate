@@ -55,6 +55,10 @@ export const monthNames = [
   "Dec",
 ];
 
+export const monthMidPoints = [
+  15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349,
+];
+
 export const calculateSmoothedData = (data: any, smoothDays: number) => {
   return data.map((_: any, i: any) => {
     let start = i - Math.floor(smoothDays / 2);

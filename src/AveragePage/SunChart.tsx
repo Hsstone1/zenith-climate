@@ -15,36 +15,26 @@ Chart.register(extendedValuesPlugin);
 
 interface ChartProps {
   aggregatedData: any[];
-  type: "Rain" | "Snow";
+  type: "Sun";
 }
 
-const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
+const SunChart = ({ aggregatedData, type }: ChartProps) => {
   const chartContainerRef = useRef(null);
 
   const datasets = aggregatedData
     .map((locationData, index) => {
       const color = chartColors[index % chartColors.length];
-      // Calculate the smoothed data for precipLineData
-      let precipLineData = [];
-      let precipBarData = [];
+      // Calculate the smoothed data for sunLineData
+      let sunLineData = [];
+      let sunBarData = [];
       const smoothDays = 14; // Days to average over
 
-      if (type === "Rain") {
-        precipLineData = calculateSmoothedData(
-          locationData.precipitation,
-          smoothDays
-        ).map((value: number) => value * 30);
-        precipBarData = calculateSmoothedData(
-          locationData.precip_days,
-          smoothDays
-        ).map((value: number) => value * 1);
-      } else {
-        precipLineData = calculateSmoothedData(
-          locationData.snow,
-          smoothDays
-        ).map((value: number) => value * 30);
-        precipBarData = calculateSmoothedData(
-          locationData.snow_days,
+      if (type === "Sun") {
+        sunLineData = calculateSmoothedData(locationData.sun, smoothDays).map(
+          (value: number) => value * 1
+        );
+        sunBarData = calculateSmoothedData(
+          locationData.sunlight_hours,
           smoothDays
         ).map((value: number) => value * 1);
       }
@@ -63,7 +53,7 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
           type: "line",
 
           label: `${type}`,
-          data: precipLineData,
+          data: sunLineData,
           borderColor: color,
           borderWidth: 2,
           backgroundColor: "transparent",
@@ -72,8 +62,8 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
         },
         {
           type: "bar",
-          label: type == "Rain" ? `Rain Days` : `Snow Days`,
-          data: aggregateMonthlyData(precipBarData).map((value, index) => ({
+          label: "Sunlight Hours",
+          data: aggregateMonthlyData(sunBarData).map((value, index) => ({
             x: monthMidPoints[index],
             y: value,
           })),
@@ -100,7 +90,7 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
       },
       title: {
         display: true,
-        text: type === "Rain" ? "Annual Rainfall" : "Annual Snowfall",
+        text: "Annual Sunlight",
         font: {
           size: 16,
         },
@@ -114,7 +104,7 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
               item &&
               item.dataset &&
               item.dataset.label &&
-              item.dataset.label.includes("Days")
+              item.dataset.label.includes("Hours")
             ) {
               const date = new Date(2020, item.dataIndex + 1, 0);
               return monthNames[date.getMonth()];
@@ -132,14 +122,14 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
             }
             if (context.parsed.y !== null) {
               // Check if the label contains the word "day"
-              const unit = label.includes("Day") ? "days" : "in";
+              const unit = label.includes("Hour") ? "Hours" : "%";
               label += `${context.parsed.y.toFixed(0)} ${unit}`;
             }
             return label;
           },
           labelTextColor: function (context: any) {
-            const precip = context.parsed.y;
-            return getBackgroundColor(precip / 12, "Precip");
+            const sun = context.parsed.y;
+            return getBackgroundColor(sun, "SunPercent");
           },
         },
       },
@@ -149,24 +139,25 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
       y: {
         // Primary Y-axis for the line chart
         beginAtZero: true,
+        max: 100,
         position: "left",
         ticks: {
           callback: function (value: any) {
-            return `${value} in`;
+            return `${value}%`;
           },
         },
       },
       y1: {
         // Secondary Y-axis for the bar chart
         beginAtZero: true,
-        max: 30,
+        max: 500,
         position: "right",
         grid: {
           drawOnChartArea: false, // Only show the grid for the left Y axis
         },
         ticks: {
           callback: function (value: any) {
-            return `${value} days`; // Days of precipitation/snow
+            return `${value} Hours`; // Days of precipitation/snow
           },
         },
       },
@@ -235,4 +226,4 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
   );
 };
 
-export default PrecipChart;
+export default SunChart;

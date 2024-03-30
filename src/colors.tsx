@@ -42,6 +42,36 @@ export const getBackgroundColor = (
           (PrecipColors.length - 1)
       )
     ];
+  } else if (dataType === "SunHours") {
+    const lowerValue = 0;
+    const upperValue = 400;
+    if (value > upperValue) {
+      return SunColors[SunColors.length - 1];
+    }
+    if (value < lowerValue) {
+      return SunColors[0];
+    }
+    return SunColors[
+      Math.round(
+        ((value + Math.abs(lowerValue)) / (upperValue + Math.abs(lowerValue))) *
+          (SunColors.length - 1)
+      )
+    ];
+  } else if (dataType === "SunPercent") {
+    const lowerValue = 0;
+    const upperValue = 100;
+    if (value > upperValue) {
+      return SunColors[SunColors.length - 1];
+    }
+    if (value < lowerValue) {
+      return SunColors[0];
+    }
+    return SunColors[
+      Math.round(
+        ((value + Math.abs(lowerValue)) / (upperValue + Math.abs(lowerValue))) *
+          (SunColors.length - 1)
+      )
+    ];
   } else if (dataType === "") {
     return "#FFFFFF";
   }
@@ -271,4 +301,107 @@ const PrecipColors = [
   "#000042",
   "#00003D",
   "#00003A",
+];
+
+const SunColors = [
+  "#000000",
+  "#0D0D0D",
+  "#1B1B1B",
+  "#282828",
+  "#363636",
+  "#444444",
+  "#515151",
+  "#5F5F5F",
+  "#6C6C6C",
+  "#7A7A7A",
+  "#888888",
+  "#959595",
+  "#A3A3A3",
+  "#ABAB9F",
+  "#AFAF8B",
+  "#B2B276",
+  "#B5B562",
+  "#B9B94E",
+  "#BCBC39",
+  "#C0C025",
+  "#C3C311",
+  "#C6C600",
+  "#CACA00",
+  "#CDCD00",
+  "#D1D100",
+  "#D4D400",
+  "#D6D600",
+  "#D7D700",
+  "#D9D900",
+  "#DBDB00",
+  "#DDDD00",
+  "#DEDE00",
+  "#E0E000",
+  "#E2E200",
+  "#E3E300",
+  "#E5E500",
+  "#E7E700",
+  "#E8E800",
+  "#EAEA02",
+  "#ECEC06",
+  "#EEEE0A",
+  "#EFEF0E",
+  "#F1F112",
+  "#F3F316",
+  "#F4F41A",
+  "#F6F61E",
+  "#F8F822",
+  "#F9F926",
+  "#FBFB2A",
+  "#FDFD2E",
+  "#FFFF33",
+  "#FFFF37",
+  "#FFFF3B",
+  "#FFFF3F",
+  "#FFFF47",
+  "#FFFF4B",
+  "#FFFF4F",
+  "#FFFF53",
+  "#FFFF57",
+  "#FFFF5B",
+  "#FFFF5F",
+  "#FFFF63",
+  "#FFFF68",
+  "#FFFF6C",
+  "#FFFF70",
+  "#FFFF74",
+  "#FFFF78",
+  "#FFFF7C",
+  "#FFFF80",
+  "#FFFF84",
+  "#FFFF88",
+  "#FFFF8C",
+  "#FFFF90",
+  "#FFFF94",
+  "#FFFF99",
+  "#FFFF9D",
+  "#FFFFA1",
+  "#FFFFA5",
+  "#FFFFA9",
+  "#FFFFAD",
+  "#FFFFB1",
+  "#FFFFB5",
+  "#FFFFB9",
+  "#FFFFBD",
+  "#FFFFC1",
+  "#FFFFC5",
+  "#FFFFC9",
+  "#FFFFCE",
+  "#FFFFD2",
+  "#FFFFD6",
+  "#FFFFDA",
+  "#FFFFDE",
+  "#FFFFE2",
+  "#FFFFE6",
+  "#FFFFEA",
+  "#FFFFEE",
+  "#FFFFF2",
+  "#FFFFF6",
+  "#FFFFFA",
+  "#FFFFFF",
 ];

@@ -52,7 +52,9 @@ const ClimateDataList = ({ options, onSelect }: DataTypeSelectionProps) => {
             borderColor:
               option.value === selected ? theme.palette.primary.main : "#ccc",
             backgroundColor:
-              option.value === selected ? theme.palette.action.selected : "",
+              option.value === selected
+                ? theme.palette.action.selected
+                : "white",
             "&:hover": {
               borderColor: theme.palette.primary.dark,
             },
