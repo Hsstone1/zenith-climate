@@ -67,6 +67,7 @@ const AveragePage = () => {
     { label: "Sun", value: "sun" },
     { label: "Humidity", value: "humidity" },
     { label: "Comfort", value: "comfort" },
+    { label: "Growing", value: "growing" },
   ];
 
   const handleDataTypeSelect = (value: string) => {

@@ -11,8 +11,8 @@ export const getBackgroundColor = (
 ) => {
   if (dataType === "Temperature") {
     //Degrees F, -20 is dark blue, 130 is dark red
-    const lowerValue = -20;
-    const upperValue = 130;
+    const lowerValue = -30;
+    const upperValue = 150;
     if (value > upperValue) {
       return TemperatureColors[TemperatureColors.length - 1];
     }

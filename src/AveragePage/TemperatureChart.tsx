@@ -1,7 +1,7 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
 import { Chart } from "chart.js/auto";
-import { chartColors, monthNames } from "../exports";
+import { calculateSmoothedData, chartColors, monthNames } from "../exports";
 import { getBackgroundColor } from "../colors";
 import { extendedValuesPlugin } from "./ChartPlugins";
 
@@ -12,6 +12,9 @@ interface ChartProps {
   aggregatedData: any[];
 }
 const TemperatureChart = ({ aggregatedData }: ChartProps) => {
+  const smoothDays = 14;
+  const downsampleFactor =
+    aggregatedData.length > 1 ? Math.min(aggregatedData.length - 1, 7) : 1;
   let globalMin = Math.min(
     ...aggregatedData.flatMap((data) => [
       ...data.high_temperature,
@@ -33,23 +36,79 @@ const TemperatureChart = ({ aggregatedData }: ChartProps) => {
     ])
   );
 
+  const downsampleToWeekly = (data: any[]) => {
+    const downsampledData = data.reduce(
+      (
+        acc: { x: number; y: number }[],
+        curr: any,
+        index: number,
+        array: any[]
+      ) => {
+        if (index % downsampleFactor === 0) {
+          // Calculate the average for the week
+          const weekSlice = array.slice(index, index + downsampleFactor);
+          if (Array.isArray(weekSlice)) {
+            // Add type guard
+            const weekAverage =
+              weekSlice.reduce((sum: number, value: number) => sum + value, 0) /
+              weekSlice.length;
+            // Determine the x-axis index for this week's average
+            const xIndex = index + 1; // Use '+1' to align with the day of the year
+            acc.push({ x: xIndex, y: weekAverage });
+          }
+        }
+        return acc;
+      },
+      []
+    );
+
+    // Ensure the last data point is at day 366 if not already
+    if (
+      downsampledData.length > 0 &&
+      downsampledData[downsampledData.length - 1].x < 366
+    ) {
+      const lastDataPoint = downsampledData[downsampledData.length - 1];
+      downsampledData.push({ x: 366, y: lastDataPoint.y }); // Duplicate the last data point at day 366
+    }
+
+    return downsampledData;
+  };
+
   const datasets = aggregatedData
     .map((locationData, index) => {
       const color = chartColors[index % chartColors.length];
-
       // High and Low Temperature dataset
-      const highTemperatureData = locationData.high_temperature || [];
-      const lowTemperatureData = locationData.low_temperature || [];
+      const highTemperatureData = calculateSmoothedData(
+        locationData.high_temperature || [],
+        smoothDays
+      );
 
+      const lowTemperatureData = calculateSmoothedData(
+        locationData.low_temperature || [],
+        smoothDays
+      );
       // Apparent High and Low Temperature dataset (dashed lines)
-      const apparentHighTemperatureData =
-        locationData.apparent_high_temperature || [];
-      const apparentLowTemperatureData =
-        locationData.apparent_low_temperature || [];
+      const apparentHighTemperatureData = downsampleToWeekly(
+        calculateSmoothedData(
+          locationData.apparent_high_temperature || [],
+          smoothDays
+        )
+      );
+
+      const apparentLowTemperatureData = downsampleToWeekly(
+        calculateSmoothedData(
+          locationData.apparent_low_temperature || [],
+          smoothDays
+        )
+      );
 
       // Expected Max and Min Temperature dataset (fill)
-      const expectedMaxData = locationData.expected_max || [];
-      const expectedMinData = locationData.expected_min || [];
+      const expectedMaxData = downsampleToWeekly(
+        calculateSmoothedData(locationData.expected_max || [], smoothDays)
+      );
+      const expectedMinData = downsampleToWeekly(
+        calculateSmoothedData(locationData.expected_min || [], smoothDays)
+      );
 
       return [
         {

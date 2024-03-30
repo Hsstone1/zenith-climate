@@ -71,8 +71,8 @@ const GooglePlacesAutocomplete = () => {
         ),
       }}
       sx={{
-        width: "25vw",
-        maxWidth: "100%",
+        minWidth: "25vw",
+        maxWidth: "40%",
         alignContent: "center",
 
         m: 1,
