@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart } from "chart.js/auto";
 import { calculateSmoothedData, chartColors, monthNames } from "../exports";
 import { getBackgroundColor } from "../colors";
 import { extendedValuesPlugin } from "./ChartPlugins";
+import useGeneralStore from "../Zustand/GeneralStore";
 
 Chart.register(extendedValuesPlugin);
 
@@ -13,6 +14,8 @@ interface ChartProps {
 }
 
 const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
+  const chartContainerRef = useRef(null);
+
   const datasets = aggregatedData
     .map((locationData, index) => {
       const color = chartColors[index % chartColors.length];
@@ -29,7 +32,7 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
         precipBarData = calculateSmoothedData(
           locationData.precip_days,
           smoothDays
-        ).map((value: number) => value * 30);
+        ).map((value: number) => value * 1);
       } else {
         precipLineData = calculateSmoothedData(
           locationData.snow,
@@ -38,8 +41,20 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
         precipBarData = calculateSmoothedData(
           locationData.snow_days,
           smoothDays
-        ).map((value: number) => value * 30);
+        ).map((value: number) => value * 1);
       }
+      const monthMidPoints = [
+        15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349,
+      ];
+
+      const aggregateMonthlyData = (locationData: any) => {
+        const monthlyTotals = new Array(12).fill(0);
+        locationData.forEach((value: any, index: any) => {
+          const month = new Date(2020, 0, index + 1).getMonth(); // Assuming leap year for day count
+          monthlyTotals[month] += value;
+        });
+        return monthlyTotals;
+      };
 
       return [
         {
@@ -53,19 +68,20 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
           tension: 0.4,
           yAxisID: "y", // Use the primary Y axis for the line
         },
-        // {
-        //   type: "line",
-        //   label: type == "Rain" ? `Rain Days` : `Snow Days`,
-        //   data: precipBarData.map((value: any, index: any) => ({
-        //     x: index + 1,
-        //     y: value,
-        //   })),
-        //   borderColor: color,
-        //   borderWidth: 0,
-        //   backgroundColor: `${color}50`,
-        //   fill: true,
-        //   yAxisID: "y1", // Use the secondary Y axis for the bars
-        // },
+        {
+          type: "bar",
+          label: type == "Rain" ? `Rain Days` : `Snow Days`,
+          data: aggregateMonthlyData(precipBarData).map((value, index) => ({
+            x: monthMidPoints[index],
+            y: value,
+          })),
+          borderColor: color,
+          borderWidth: 0,
+          backgroundColor: `${color}75`,
+          yAxisID: "y1",
+          barThickness: 10,
+          grouped: true,
+        },
       ];
     })
     .flat();
@@ -91,8 +107,20 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
         callbacks: {
           // Customizing tooltip title to show "MMM DD"
           title: function (tooltipItems: any) {
-            const date = new Date(2020, 0, tooltipItems[0].label); // Convert the index back to a date
-            return `${monthNames[date.getMonth()]} ${date.getDate()}`; // Format as "MMM DD"
+            const item = tooltipItems[0];
+            if (
+              item &&
+              item.dataset &&
+              item.dataset.label &&
+              item.dataset.label.includes("Days")
+            ) {
+              const date = new Date(2020, item.dataIndex + 1, 0);
+              return monthNames[date.getMonth()];
+            } else {
+              // Fallback to default behavior
+              const date = new Date(2020, 0, tooltipItems[0].label);
+              return `${monthNames[date.getMonth()]} ${date.getDate()}`;
+            }
           },
           // Append units to tooltip values
           label: function (context: any) {
@@ -102,7 +130,7 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
             }
             if (context.parsed.y !== null) {
               // Check if the label contains the word "day"
-              const unit = label.toLowerCase().includes("day") ? "days" : "in";
+              const unit = label.includes("Day") ? "days" : "in";
               label += `${context.parsed.y.toFixed(0)} ${unit}`;
             }
             return label;
@@ -202,7 +230,7 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
   };
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div ref={chartContainerRef} style={{ width: "100%", height: "100%" }}>
       {/* @ts-ignore */}
       <Line options={options} data={{ labels, datasets }} />
     </div>

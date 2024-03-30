@@ -10,7 +10,7 @@ type GeneralStoreState = {
 };
 
 const useGeneralStore = create<GeneralStoreState>((set) => ({
-    isSidebarOpen: false,
+    isSidebarOpen: true,
 
     setIsSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
     mapInstance: null,

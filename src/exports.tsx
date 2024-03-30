@@ -35,9 +35,9 @@ export const containerColor = "#f8f8f8";
 
 export const chartColors = [
   "#0384fc", // Darker version of #ADD8E6
-  "#f77f5e", // Darker version of #FFC0CB
+  "#f52c2c", // Darker version of #FFC0CB
   "#c284e3", // Darker version of #D8BFD8
-  "#ffee00", // Darker version of #FFE4E1
+  "#20b806", // Darker version of #FFE4E1
   "#f2d085", // Darker version of #90EE90
 ];
 export const monthNames = [

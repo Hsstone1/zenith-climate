@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
@@ -21,14 +21,23 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
     defaultOption || dropdownOptions[0].label
   ); // Use first option as default if not provided
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  let leaveTimer: NodeJS.Timeout;
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLButtonElement>) => {
+    clearTimeout(leaveTimer);
     setAnchorEl(event.currentTarget);
   };
 
+  const handleMouseLeave = () => {
+    leaveTimer = setTimeout(() => {
+      setAnchorEl(null);
+    }, 100);
+  };
+
   const handleClose = (value: string, route: string) => {
-    setSelected(value);
+    //setSelected(value);
     setAnchorEl(null);
-    navigate(`/${route}`); // Ensure navigation is relative to the root
+    navigate(`/${route}`);
   };
 
   return (
@@ -37,7 +46,7 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
         <IconButton
           aria-controls="simple-menu"
           aria-haspopup="true"
-          onClick={handleClick}
+          onMouseEnter={handleMouseEnter}
           size="small" // Adjust the size as needed
         >
           <ExpandMoreIcon />
@@ -49,6 +58,10 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
+        MenuListProps={{
+          onMouseEnter: () => clearTimeout(leaveTimer),
+          onMouseLeave: handleMouseLeave,
+        }}
       >
         {dropdownOptions.map((option) => (
           <MenuItem
@@ -74,10 +87,11 @@ const RouteDropdown = ({ defaultOption }: RouteDropdownProps) => {
       </Menu>
       <Typography
         variant="h6"
-        component="div"
+        component="span"
         sx={{
           mr: 1, // Adds a small margin to the right of the text for spacing
         }}
+        onMouseEnter={handleMouseEnter}
       >
         {selected}
       </Typography>
