@@ -128,8 +128,11 @@ const SunChart = ({ aggregatedData, type }: ChartProps) => {
             return label;
           },
           labelTextColor: function (context: any) {
-            const sun = context.parsed.y;
-            return getBackgroundColor(sun, "SunPercent");
+            let label = context.dataset.label || "";
+            if (label.includes("Hours")) {
+              return getBackgroundColor(context.parsed.y, "SunHours");
+            }
+            return getBackgroundColor(context.parsed.y, "SunPercent");
           },
         },
       },

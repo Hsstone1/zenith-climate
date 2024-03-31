@@ -36,6 +36,8 @@ const Sidebar = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
+  const sidebarNavigation = ["Home", "Average", "API"];
+
   const handleAccountClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -193,25 +195,21 @@ const Sidebar = () => {
     </Box>
   ) : (
     <List>
-      {["Home", "Average", "Historical", "Climate Trends", "API"].map(
-        (text, index) => (
-          <ListItem
-            button
-            key={text}
-            component={Link}
-            to={"/" + text.toLowerCase().replace(" ", "")}
-          >
-            <ListItemIcon>
-              {index === 0 && <HomeIcon />}
-              {index === 1 && <AverageIcon />}
-              {index === 2 && <HistoricalIcon />}
-              {index === 3 && <TrendsIcon />}
-              {index === 4 && <ApiIcon />}
-            </ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        )
-      )}
+      {["Home", "Climate Data", "API"].map((text, index) => (
+        <ListItem
+          button
+          key={text}
+          component={Link}
+          to={"/" + sidebarNavigation[index].toLowerCase().replace(" ", "")}
+        >
+          <ListItemIcon>
+            {index === 0 && <HomeIcon />}
+            {index === 1 && <AverageIcon />}
+            {index === 2 && <ApiIcon />}
+          </ListItemIcon>
+          <ListItemText primary={text} />
+        </ListItem>
+      ))}
     </List>
   );
 

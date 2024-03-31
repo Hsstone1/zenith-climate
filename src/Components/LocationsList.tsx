@@ -1,5 +1,5 @@
 // LocationsList.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Location } from "../exports";
 import useLocationStore from "../Zustand/LocationStore";
 import {
@@ -15,17 +15,48 @@ import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 import InfoIcon from "@mui/icons-material/Info";
 import useGeneralStore from "../Zustand/GeneralStore";
 
-const LocationsList = () => {
+interface LocationsListProps {
+  singleVisibleLocation?: boolean;
+}
+
+const LocationsList = ({ singleVisibleLocation }: LocationsListProps) => {
   const {
     locations,
     removeLocation,
     toggleVisibility,
     selectedLocation,
     setSelectedLocation,
+    toggleVisibilityExclusive,
   } = useLocationStore();
   const [confirmDelete, setConfirmDelete] = useState<Location | null>();
   const { isSidebarOpen, setIsSidebarOpen } = useGeneralStore();
 
+  useEffect(() => {
+    if (singleVisibleLocation && locations.length > 0) {
+      const visibleLocations = locations.filter((loc) => loc.visible);
+
+      if (visibleLocations.length > 1) {
+        // Always ensure only the first initially visible location remains visible, or the latest added if none are visible
+        const targetVisibleLocationId =
+          visibleLocations.length > 0
+            ? visibleLocations[0].id
+            : locations[locations.length - 1].id;
+
+        toggleVisibilityExclusive(targetVisibleLocationId);
+        toggleVisibilityExclusive(targetVisibleLocationId);
+      }
+    }
+  }, [locations, singleVisibleLocation]);
+
+  const handleLocationClick = (location: Location) => {
+    if (singleVisibleLocation) {
+      // Use the new toggle method when singleVisibleLocation is true
+      toggleVisibilityExclusive(location.id);
+    } else {
+      // Use the original toggle method when false
+      toggleVisibility(location);
+    }
+  };
   const handleInfoClick = (
     event: React.MouseEvent<HTMLElement>,
     location: Location
@@ -112,7 +143,7 @@ const LocationsList = () => {
 
               width: "fit-content",
             }}
-            onClick={() => toggleVisibility(location)}
+            onClick={() => handleLocationClick(location)}
           >
             <Typography
               variant="body1"

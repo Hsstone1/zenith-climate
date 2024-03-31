@@ -11,25 +11,11 @@ export interface Location {
   longitude: number;
   elevation: number;
   average_data: any;
+  historical_data: any;
   koppen: string;
   hardiness: string;
   isLoading: boolean;
 }
-
-export const dropdownOptions = [
-  { label: "Home", description: "View Map", value: "home" },
-  {
-    label: "Averages",
-    description: "View climate averages",
-    value: "average",
-  },
-  {
-    label: "Historical",
-    description: "View historical climate data",
-    value: "historical",
-  },
-  { label: "Trends", description: "View climate trends", value: "trends" },
-];
 
 export const containerColor = "#f8f8f8";
 
@@ -58,6 +44,10 @@ export const monthNames = [
 export const monthMidPoints = [
   15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349,
 ];
+
+export const isLeapYear = (year: number) => {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+};
 
 export const calculateSmoothedData = (data: any, smoothDays: number) => {
   return data.map((_: any, i: any) => {

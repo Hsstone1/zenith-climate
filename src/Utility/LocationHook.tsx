@@ -19,6 +19,7 @@ export const useNewLocation = () => {
       longitude,
       elevation: 0, // Initially empty or null
       average_data: {}, // Initially empty
+      historical_data: {}, // Initially empty
       koppen: "", // Initially empty
       hardiness: "", // Initially empty
       isLoading: true, // Initially loading
@@ -37,6 +38,7 @@ export const useNewLocation = () => {
         longitude,
         elevation,
         average_data: climate_data,
+        historical_data: null,
         koppen: location_data.koppen,
         hardiness: location_data.plant_hardiness,
         isLoading: false, // Set isLoading to false

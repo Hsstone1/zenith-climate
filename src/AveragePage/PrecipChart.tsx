@@ -27,26 +27,26 @@ const PrecipChart = ({ aggregatedData, type }: ChartProps) => {
       // Calculate the smoothed data for precipLineData
       let precipLineData = [];
       let precipBarData = [];
-      const smoothDays = 14; // Days to average over
+      const smoothDays = 30; // Days to average over
 
       if (type === "Rain") {
         precipLineData = calculateSmoothedData(
-          locationData.precipitation,
+          locationData.precipitation.map((value: number) => value * 30),
           smoothDays
-        ).map((value: number) => value * 30);
+        );
         precipBarData = calculateSmoothedData(
           locationData.precip_days,
           smoothDays
-        ).map((value: number) => value * 1);
+        );
       } else {
         precipLineData = calculateSmoothedData(
-          locationData.snow,
+          locationData.snow.map((value: number) => value * 30),
           smoothDays
-        ).map((value: number) => value * 30);
+        );
         precipBarData = calculateSmoothedData(
           locationData.snow_days,
           smoothDays
-        ).map((value: number) => value * 1);
+        );
       }
 
       const aggregateMonthlyData = (locationData: any) => {

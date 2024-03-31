@@ -9,10 +9,24 @@ import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom"; // For navigation
 import Box from "@mui/material/Box"; // Importing Box for additional layout control
-import { dropdownOptions } from "../exports";
 import GooglePlacesAutocomplete from "./GoogleAutocomplete";
 import Button from "@mui/material/Button";
 import useGeneralStore from "../Zustand/GeneralStore";
+
+const dropdownOptions = [
+  { label: "Home", description: "View Map", value: "home" },
+  {
+    label: "Averages",
+    description: "View climate averages",
+    value: "average",
+  },
+  {
+    label: "Historical",
+    description: "View historical climate data",
+    value: "historical",
+  },
+  { label: "Trends", description: "View climate trends", value: "trends" },
+];
 
 interface RouteDropdownProps {
   defaultOption?: string;
