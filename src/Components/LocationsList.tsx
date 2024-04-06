@@ -114,14 +114,20 @@ const LocationsList = ({ singleVisibleLocation }: LocationsListProps) => {
           display: "flex",
           p: 1,
           overflowX: "scroll", // Enable horizontal scrolling
+          // Custom scrollbar styles for Webkit browsers (Chrome, Safari, Edge)
           "&::-webkit-scrollbar": {
-            display: "none",
+            backgroundColor: `rgba(0,0,0,0.1)`, // Background color of the scrollbar track
+            height: `0.4rem`, // Height of the scrollbar
+            borderRadius: `1rem`, // Round the scrollbar
           },
-          scrollbarWidth: "none",
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: `rgba(0,0,0,0.3)`, // Color of the scrollbar thumb
+            borderRadius: `1rem`, // Round the thumb
+          },
         }}
       >
         {locations.map((location) => (
-          <ButtonBase
+          <Box
             key={location.id}
             sx={{
               border: 2,
@@ -129,35 +135,60 @@ const LocationsList = ({ singleVisibleLocation }: LocationsListProps) => {
                 ? "error.main"
                 : location.visible
                 ? "primary.main"
-                : "divider", // Conditional borderColor
+                : "divider",
               animation: location.isLoading
                 ? "borderColorFade 2s infinite"
-                : "none", // Apply animation if loading
-
+                : "none",
               px: 1,
               mx: 1,
               display: "flex",
               flexDirection: "column",
-              alignItems: "center", // Align items to center
+              alignItems: "center",
               borderRadius: "1rem",
-
               width: "fit-content",
+              height: "10vh",
+              cursor: "pointer", // Make it obvious it's clickable
             }}
             onClick={() => handleLocationClick(location)}
           >
             <Typography
               variant="body1"
-              gutterBottom
               noWrap
               sx={{
                 width: "15vw",
                 minWidth: "125px",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
+                textAlign: "center",
               }}
             >
-              {!location.isLoading ? location.name : "Loading..."}
+              {!location.isLoading ? (
+                location.name.includes(",") ? (
+                  <>{location.name.split(",", 2).join(",")}</>
+                ) : (
+                  location.name
+                )
+              ) : (
+                "Loading..."
+              )}
             </Typography>
+            {location.name.includes(",") &&
+              location.name.split(",").length > 2 && (
+                <Typography
+                  variant="body2" // You can adjust the variant for a different typography font
+                  noWrap
+                  sx={{
+                    width: "15vw",
+                    minWidth: "125px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    color: "gray", // This sets the color to light gray
+                    textAlign: "center",
+                  }}
+                >
+                  {location.name.split(",").slice(2).join(",")}
+                </Typography>
+              )}
             {!location.isLoading && (
               <Box
                 sx={{
@@ -209,7 +240,7 @@ const LocationsList = ({ singleVisibleLocation }: LocationsListProps) => {
                 </Tooltip>
               </Box>
             )}
-          </ButtonBase>
+          </Box>
         ))}
       </Box>
     </>

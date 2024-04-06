@@ -5,9 +5,12 @@ import LocationsList from "../Components/LocationsList";
 import ClimateDataList from "../Components/ClimateDataList";
 import { Box } from "@mui/system";
 
+import CircularProgress from "@mui/material/CircularProgress";
+
 import useLocationStore from "../Zustand/LocationStore";
-import TemperatureChart from "./HistoricalTemperatureChart";
+import HistoricalChart from "./HistoricalChart";
 import { fetchClimateDataYear } from "../API/DatabaseFunctions";
+
 import { Location } from "../exports";
 // import LocationColorsList from "./VisibleLocationColors";
 // import PrecipChart from "./PrecipChart";
@@ -20,166 +23,137 @@ interface AggregatedData {
 
 const HistoricalPage = () => {
   const { locations, updateHistoricalData } = useLocationStore();
-  const [selectedChart, setSelectedChart] = useState("temperature");
   const [selectedYear, setSelectedYear] = useState(2022);
   const [dataFetched, setDataFetched] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
 
   useEffect(() => {
+    setDataFetched(false);
+    const visibleLocation = locations.find((location) => location.visible);
+    setSelectedLocation(visibleLocation || null);
+
     const fetchData = async () => {
-      setDataFetched(false);
+      if (!visibleLocation) return; // Early exit if no visible location
 
-      const fetchPromises = locations.map((location) => {
-        if (
-          location.visible &&
-          location.average_data &&
-          (!location.historical_data || !location.historical_data[selectedYear])
-        ) {
-          return fetchClimateDataYear(
-            location.latitude,
-            location.longitude,
-            location.elevation,
-            selectedYear
+      const needsFetching =
+        !visibleLocation.historical_data ||
+        !visibleLocation.historical_data[selectedYear];
+      if (needsFetching) {
+        fetchClimateDataYear(
+          visibleLocation.latitude,
+          visibleLocation.longitude,
+          visibleLocation.elevation,
+          selectedYear
+        )
+          .then((data) =>
+            updateHistoricalData(visibleLocation.id, selectedYear, data)
           )
-            .then((data) =>
-              updateHistoricalData(location.id, selectedYear, data)
+          .catch((error) =>
+            console.error(
+              `Failed to fetch data for ${visibleLocation.name}:`,
+              error
             )
-            .catch((error) =>
-              console.error(`Failed to fetch data for ${location.name}:`, error)
-            );
-        }
-        return Promise.resolve();
-      });
-
-      await Promise.all(fetchPromises);
-      setDataFetched(true); // Indicate that data fetching has completed
+          )
+          .finally(() => setDataFetched(true));
+      } else {
+        setDataFetched(true); // Data already fetched for the selected year
+      }
     };
 
-    setDataFetched(false); // Reset the flag when the selectedYear or locations change
     fetchData();
   }, [selectedYear, locations]);
 
-  const aggregateVisibleLocationData = (fields: string[]) => {
-    const aggregatedData: {}[] = [];
-
-    locations.forEach((location) => {
-      if (
-        location.visible &&
-        location.average_data && // Ensure average_data is loaded
-        Object.keys(location.average_data).length > 0 && // Check that average_data is not empty
-        location.historical_data && // Ensure historical_data is initialized
-        location.historical_data[selectedYear]
-      ) {
-        // Initialize an object to store the daily data for the current visible location
-        const locationData: { [key: string]: any } = {};
-
-        fields.forEach((field) => {
-          let dailyData = null;
-          // Extract the 'daily' data for the current field
-          if (
-            location.historical_data &&
-            location.historical_data[selectedYear]
-          ) {
-            dailyData = location.historical_data[selectedYear][field]?.daily;
-            locationData[field] = dailyData;
-          }
-        });
-
-        // Add the populated locationData object to the aggregatedData array
-        aggregatedData.push(locationData);
-      }
-    });
-
-    return aggregatedData;
-  };
-
-  const dataTypeOptions = [
-    { label: "Temperature", value: "temperature" },
-    { label: "Rain", value: "rain" },
-    { label: "Snow", value: "snow" },
-    { label: "Sun", value: "sun" },
-    { label: "Humidity", value: "humidity" },
-  ];
-
-  const handleDataTypeSelect = (value: string) => {
-    // Handle the selection of data type here
-    // This could involve fetching data or updating the UI to show the selected type's data
-    console.log("Selected data type:", value);
-    setSelectedChart(value);
-  };
-
-  const temperatureAggregatedData = aggregateVisibleLocationData([
-    "high_temperature",
-    "low_temperature",
-    "apparent_high_temperature",
-    "apparent_low_temperature",
-  ]);
-
-  //   const rainAggregatedData = aggregateVisibleLocationData([
-  //     "precipitation",
-  //     "precip_days",
-  //   ]);
-
-  //   const snowAggregatedData = aggregateVisibleLocationData([
-  //     "snow",
-  //     "snow_days",
-  //   ]);
-
-  //   const sunAggregatedData = aggregateVisibleLocationData([
-  //     "sun",
-  //     "sunlight_hours",
-  //   ]);
-
-  //   const humidityAggregatedData = aggregateVisibleLocationData([
-  //     "mean_humidity",
-  //     "expected_max_dewpoint",
-  //   ]);
-
-  const renderSelectedChart = () => {
-    switch (selectedChart) {
-      case "temperature":
-        return (
-          <TemperatureChart
-            aggregatedData={temperatureAggregatedData}
-            year={selectedYear}
-          />
-        );
-      //   case "rain":
-      //     return <PrecipChart aggregatedData={rainAggregatedData} type="Rain" />;
-      //   case "snow":
-      //     return <PrecipChart aggregatedData={snowAggregatedData} type="Snow" />;
-      //   case "sun":
-      //     return <SunChart aggregatedData={sunAggregatedData} type="Sun" />;
-      //   case "humidity":
-      //     return (
-      //       <HumidityChart
-      //         aggregatedData={humidityAggregatedData}
-      //         type="Humidity"
-      //       />
-      //     );
-      //default:
-      //  return <TemperatureChart aggregatedData={temperatureAggregatedData} />; // Default case if needed
+  const aggregateVisibleLocationData = () => {
+    if (
+      !selectedLocation ||
+      !selectedLocation.average_data ||
+      Object.keys(selectedLocation.average_data).length === 0 ||
+      !selectedLocation.historical_data ||
+      !selectedLocation.historical_data[selectedYear]
+    ) {
+      return [];
     }
+
+    const fields = [
+      "high_temperature",
+      "low_temperature",
+      "apparent_high_temperature",
+      "apparent_low_temperature",
+    ];
+    const locationData = fields.reduce((acc: any, field) => {
+      const dailyData =
+        selectedLocation.historical_data[selectedYear][field]?.daily;
+      if (dailyData) {
+        acc[field] = dailyData;
+      }
+      return acc;
+    }, {});
+
+    return [locationData];
   };
+
+  const temperatureAggregatedData = aggregateVisibleLocationData();
 
   return (
     <Container>
       <RouteDropdown defaultOption={"Historical"} />
 
-      <ClimateDataList
-        options={dataTypeOptions}
-        onSelect={handleDataTypeSelect}
-      />
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          height: "75%",
+          height: "70%",
           overflow: "hidden",
         }}
       >
         <Box sx={{ flexGrow: 1, flexShrink: 1, overflow: "auto" }}>
-          {dataFetched && renderSelectedChart()}
+          {dataFetched &&
+          temperatureAggregatedData.length > 0 &&
+          selectedLocation ? (
+            <HistoricalChart
+              aggregatedData={temperatureAggregatedData}
+              year={selectedYear}
+              locationName={selectedLocation?.name}
+            />
+          ) : locations.length > 0 ? ( // Check if there are any locations
+            !dataFetched ? ( // If data is not yet fetched
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                }}
+              >
+                <CircularProgress /> {/* Show spinner */}
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                }}
+              >
+                Add a Location to view Historical Data
+              </Box>
+            )
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
+              Add a Location to view Historical Data
+            </Box>
+          )}
         </Box>
       </Box>
 

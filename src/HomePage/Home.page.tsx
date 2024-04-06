@@ -28,11 +28,11 @@ const HomePage = () => {
     <Container>
       <RouteDropdown defaultOption={"Home"} />
 
-      <Box sx={{ height: "80%" }}>
+      <Box sx={{ height: "75%" }}>
         <MapComponent
           onMapClick={handleMapClick}
           mapContainerStyle={{
-            height: "70vh",
+            height: "65vh",
             width: "100%",
           }}
         />

@@ -12,6 +12,7 @@ root.render(
     <LoadScript
       googleMapsApiKey={process.env.REACT_APP_GOOGLE_API_KEY || ""}
       libraries={["places"]}
+      language={"en"}
     >
       <App />
     </LoadScript>

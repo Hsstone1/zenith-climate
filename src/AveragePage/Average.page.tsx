@@ -133,24 +133,41 @@ const AveragePage = () => {
     <Container>
       <RouteDropdown defaultOption={"Average"} />
 
-      <ClimateDataList
-        options={dataTypeOptions}
-        onSelect={handleDataTypeSelect}
-      />
+      {temperatureAggregatedData.length > 0 ? (
+        <ClimateDataList
+          options={dataTypeOptions}
+          onSelect={handleDataTypeSelect}
+        />
+      ) : null}
+
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between", // Ensures spaced layout
-          height: "75%", // Adjust this value based on your actual header/navigation height
+          height: "70%", // Adjust this value based on your actual header/navigation height
           overflow: "hidden", // Prevents children from overflowing
         }}
       >
         <Box sx={{ flexGrow: 0, flexShrink: 0, m: 1 }}>
           <LocationColorsList />
         </Box>
+
         <Box sx={{ flexGrow: 1, flexShrink: 1, overflow: "auto" }}>
-          {renderSelectedChart()}
+          {temperatureAggregatedData.length > 0 ? (
+            renderSelectedChart()
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
+              Add a Location to view Climate Data
+            </Box>
+          )}
         </Box>
       </Box>
 
