@@ -29,6 +29,12 @@ const HistoricalPage = () => {
     null
   );
 
+  let processedLocationName = selectedLocation?.name;
+  const parts = selectedLocation?.name.split(",") ?? [];
+  if (parts.length > 2) {
+    processedLocationName = parts.slice(0, 2).join(",");
+  }
+
   useEffect(() => {
     setDataFetched(false);
     const visibleLocation = locations.find((location) => location.visible);
@@ -116,7 +122,11 @@ const HistoricalPage = () => {
             <HistoricalChart
               aggregatedData={temperatureAggregatedData}
               year={selectedYear}
-              locationName={selectedLocation?.name}
+              locationName={
+                processedLocationName
+                  ? processedLocationName
+                  : selectedLocation?.name
+              }
             />
           ) : locations.length > 0 ? ( // Check if there are any locations
             !dataFetched ? ( // If data is not yet fetched

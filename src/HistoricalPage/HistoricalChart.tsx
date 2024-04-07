@@ -57,19 +57,11 @@ const HistoricalChart = ({
       ...data.apparent_high_temperature,
     ])
   );
-
-  let processedLocationName = locationName;
-  const parts = locationName.split(",");
-
-  // If there are more than one commas, rejoin the first two parts
-  if (parts.length > 2) {
-    processedLocationName = parts.slice(0, 2).join(",");
-  }
+  const includeApparentTemperatures =
+    (visibleRange.max - visibleRange.min) / (daysInYear * 2) < 0.1;
 
   const processedData = useMemo(() => {
     // Calculate if we should include apparent temperature datasets
-    const includeApparentTemperatures =
-      visibleRange.max - visibleRange.min < 120;
 
     return aggregatedData.flatMap((locationData, index) => {
       const color = chartColors[index % chartColors.length];
@@ -89,7 +81,14 @@ const HistoricalChart = ({
         backgroundColor: color,
         borderColor: color,
         fill: false,
-
+        pointBackgroundColor: combinedTemperatureData.map((dataPoint) =>
+          getBackgroundColor(dataPoint.y, "Temperature")
+        ),
+        pointBorderColor: combinedTemperatureData.map((dataPoint) =>
+          getBackgroundColor(dataPoint.y, "Temperature")
+        ),
+        pointRadius: 0.5,
+        pointHoverRadius: 2,
         tension: 0.7,
         borderWidth: 1,
         yaxisID: "y",
@@ -140,6 +139,14 @@ const HistoricalChart = ({
           data: combinedApparentData,
           backgroundColor: color,
           borderColor: color,
+          pointBackgroundColor: combinedApparentData.map((dataPoint) =>
+            getBackgroundColor(dataPoint.y, "Temperature")
+          ),
+          pointBorderColor: combinedApparentData.map((dataPoint) =>
+            getBackgroundColor(dataPoint.y, "Temperature")
+          ),
+          pointRadius: 0,
+          pointHoverRadius: 2,
           fill: false,
           tension: 0.5,
           borderWidth: 0.5,
@@ -189,10 +196,6 @@ const HistoricalChart = ({
   );
 
   useEffect(() => {
-    console.log(visibleRange);
-  }, [visibleRange]);
-
-  useEffect(() => {
     // Reset visible range when the component mounts
     setVisibleRange({ min: 0, max: 365 * 2 });
   }, []); // Empty dependency array means this runs once on mount
@@ -228,7 +231,7 @@ const HistoricalChart = ({
         },
         title: {
           display: true,
-          text: `${processedLocationName} Historical Data for ${year}`,
+          text: `${locationName} Historical Data for ${year}`,
           font: {
             size: 16,
           },
@@ -372,17 +375,12 @@ const HistoricalChart = ({
         },
       },
 
-      elements: {
-        point: {
-          radius: 0, // Optionally hide points
-        },
-      },
       interaction: {
         mode: "index", // Replace "string" with one of the valid options
         intersect: false,
       },
     }),
-    [globalMin, globalMax, daysInYear, processedLocationName, year]
+    [globalMin, globalMax, daysInYear, locationName, year]
   );
 
   return (
