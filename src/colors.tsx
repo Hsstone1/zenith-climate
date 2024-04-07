@@ -11,20 +11,21 @@ export const getBackgroundColor = (
 ) => {
   if (dataType === "Temperature") {
     //Degrees F, -20 is dark blue, 130 is dark red
-    const lowerValue = -30;
-    const upperValue = 150;
-    if (value > upperValue) {
-      return TemperatureColors[TemperatureColors.length - 1];
-    }
-    if (value < lowerValue) {
-      return TemperatureColors[0];
-    }
-    return TemperatureColors[
-      Math.round(
-        ((value + Math.abs(lowerValue)) / (upperValue + Math.abs(lowerValue))) *
-          (TemperatureColors.length - 1)
-      )
-    ];
+    // const lowerValue = -30;
+    // const upperValue = 150;
+    // if (value > upperValue) {
+    //   return TemperatureColors[TemperatureColors.length - 1];
+    // }
+    // if (value < lowerValue) {
+    //   return TemperatureColors[0];
+    // }
+    // return TemperatureColors[
+    //   Math.round(
+    //     ((value + Math.abs(lowerValue)) / (upperValue + Math.abs(lowerValue))) *
+    //       (TemperatureColors.length - 1)
+    //   )
+    // ];
+    return temperatureToColor(value);
   } else if (dataType === "Precip") {
     //Inches of rain per month 0 is light blue, 12 is dark blue
 
@@ -89,6 +90,59 @@ export const getTextColor = (value: number, dataType: string) => {
   } else if (dataType === "SunPercent") {
     return value <= 19.5 ? "#FFFFFF" : "#000000";
   }
+};
+
+export const temperatureToColor = (tempF: number): string => {
+  // Helper function to parse a hex color and interpolate between two colors
+  const interpolateColor = (
+    color1: string,
+    color2: string,
+    factor: number
+  ): string => {
+    const result = color1
+      .slice(1)
+      .match(/.{2}/g)!
+      .map((hex, i) => {
+        const value1 = parseInt(hex, 16);
+        const value2 = parseInt(color2.slice(1).match(/.{2}/g)![i], 16);
+        const value = Math.round(value1 + (value2 - value1) * factor);
+        return ("0" + value.toString(16)).slice(-2);
+      })
+      .join("");
+    return `#${result}`;
+  };
+
+  // Define the colors for each range
+  const colors = [
+    { temp: 0, color: "#ffc0ff" },
+    { temp: 10, color: "#d873dc" },
+    { temp: 20, color: "#923abb" },
+    { temp: 30, color: "#372398" },
+    { temp: 40, color: "#07b6dc" },
+    { temp: 50, color: "#01d786" },
+    { temp: 60, color: "#5acc02" },
+    { temp: 70, color: "#fdfb01" },
+    { temp: 80, color: "#fb7a00" },
+    { temp: 90, color: "#d22402" },
+    { temp: 100, color: "#a00802" },
+    { temp: 101, color: "#820000" }, // Use 101 for temperatures over 100
+  ];
+
+  for (let i = 0; i < colors.length - 1; i++) {
+    const currentRange = colors[i];
+    const nextRange = colors[i + 1];
+    if (tempF >= currentRange.temp && tempF < nextRange.temp) {
+      const range = nextRange.temp - currentRange.temp;
+      const factor = (tempF - currentRange.temp) / range;
+      return interpolateColor(currentRange.color, nextRange.color, factor);
+    }
+  }
+
+  // Return white for temperatures below 0
+  if (tempF < 0) return "#FFFFFF";
+
+  // Return the color for temperatures above 100
+  return colors[colors.length - 1].color;
 };
 
 const TemperatureColors = [

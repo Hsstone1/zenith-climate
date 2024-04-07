@@ -16,7 +16,7 @@ import {
   isLeapYear,
   monthNames,
 } from "../exports";
-import { getBackgroundColor } from "../colors";
+import { getBackgroundColor, temperatureToColor } from "../colors";
 import { extendedValuesPlugin } from "./HistoricalChartPlugins";
 import useHistoricalStore from "../Zustand/HistoricalStore";
 
@@ -70,7 +70,6 @@ const HistoricalChart = ({
     // Calculate if we should include apparent temperature datasets
     const includeApparentTemperatures =
       visibleRange.max - visibleRange.min < 120;
-    console.log("includeApparentTemperatures", includeApparentTemperatures);
 
     return aggregatedData.flatMap((locationData, index) => {
       const color = chartColors[index % chartColors.length];
@@ -90,9 +89,37 @@ const HistoricalChart = ({
         backgroundColor: color,
         borderColor: color,
         fill: false,
+
         tension: 0.7,
         borderWidth: 1,
         yaxisID: "y",
+
+        segment: {
+          borderColor: (ctx: any) => {
+            // Get the start and end points of the segment
+            const startIndex = ctx.p0DataIndex;
+            const endIndex = ctx.p1DataIndex;
+
+            // Calculate the average temperature between the start and end points
+            if (
+              startIndex != null &&
+              endIndex != null &&
+              combinedTemperatureData[startIndex] &&
+              combinedTemperatureData[endIndex]
+            ) {
+              const avgTemp =
+                (combinedTemperatureData[startIndex].y +
+                  combinedTemperatureData[endIndex].y) /
+                2;
+
+              // Use your function to get the color based on the average temperature
+              return getBackgroundColor(avgTemp, "Temperature");
+            }
+
+            // Fallback color if for some reason we can't calculate it
+            return color;
+          },
+        },
       };
 
       const datasets = [temperatureDataset];
@@ -118,6 +145,33 @@ const HistoricalChart = ({
           borderWidth: 0.5,
           borderDash: [10, 5],
           yaxisID: "y1",
+
+          segment: {
+            borderColor: (ctx: any) => {
+              // Get the start and end points of the segment
+              const startIndex = ctx.p0DataIndex;
+              const endIndex = ctx.p1DataIndex;
+
+              // Calculate the average temperature between the start and end points
+              if (
+                startIndex != null &&
+                endIndex != null &&
+                combinedApparentData[startIndex] &&
+                combinedApparentData[endIndex]
+              ) {
+                const avgTemp =
+                  (combinedApparentData[startIndex].y +
+                    combinedApparentData[endIndex].y) /
+                  2;
+
+                // Use your function to get the color based on the average temperature
+                return getBackgroundColor(avgTemp, "Temperature");
+              }
+
+              // Fallback color if for some reason we can't calculate it
+              return color;
+            },
+          },
         };
 
         datasets.push(apparentDataset);
