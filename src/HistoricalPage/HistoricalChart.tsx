@@ -47,14 +47,14 @@ const HistoricalChart = ({
   // Find the global min and max values for the y-axis
   let globalMin = Math.min(
     ...aggregatedData.flatMap((data) => [
-      ...data.high_temperature,
       ...data.low_temperature,
+      ...data.apparent_low_temperature,
     ])
   );
   let globalMax = Math.max(
     ...aggregatedData.flatMap((data) => [
       ...data.high_temperature,
-      ...data.low_temperature,
+      ...data.apparent_high_temperature,
     ])
   );
 
@@ -66,65 +66,66 @@ const HistoricalChart = ({
     processedLocationName = parts.slice(0, 2).join(",");
   }
 
-  const processedData = aggregatedData.flatMap((locationData, index) => {
-    const color = chartColors[index % chartColors.length];
-    const combinedTemperatureData: { x: number; y: any }[] = [];
+  const processedData = useMemo(() => {
+    // Calculate if we should include apparent temperature datasets
+    const includeApparentTemperatures =
+      visibleRange.max - visibleRange.min < 120;
+    console.log("includeApparentTemperatures", includeApparentTemperatures);
 
-    // Your existing code for actual temperatures...
-    const highTemps = locationData.high_temperature || [];
-    const lowTemps = locationData.low_temperature || [];
+    return aggregatedData.flatMap((locationData, index) => {
+      const color = chartColors[index % chartColors.length];
+      const combinedTemperatureData: { x: number; y: any }[] = [];
 
-    for (let i = 0; i < locationData.high_temperature.length; i++) {
-      combinedTemperatureData.push({
-        x: i * 2 + 1,
-        y: highTemps[i],
-      });
-      combinedTemperatureData.push({
-        x: i * 2 + 2,
-        y: lowTemps[i],
-      });
-    }
-    const temperatureDataset = {
-      label: `Temperature`,
-      data: combinedTemperatureData,
-      backgroundColor: color,
-      borderColor: color,
-      fill: false,
-      tension: 0.7,
-      borderWidth: 1,
-      yaxisID: "y",
-    };
+      // Existing code for actual temperatures...
+      const highTemps = locationData.high_temperature || [];
+      const lowTemps = locationData.low_temperature || [];
 
-    // New: Process apparent high and low temperatures
-    const apparentHighTemps = locationData.apparent_high_temperature || [];
-    const apparentLowTemps = locationData.apparent_low_temperature || [];
-    const combinedApparentData: { x: number; y: any }[] = [];
+      for (let i = 0; i < locationData.high_temperature.length; i++) {
+        combinedTemperatureData.push({ x: i * 2 + 1, y: highTemps[i] });
+        combinedTemperatureData.push({ x: i * 2 + 2, y: lowTemps[i] });
+      }
+      const temperatureDataset = {
+        label: `Temperature`,
+        data: combinedTemperatureData,
+        backgroundColor: color,
+        borderColor: color,
+        fill: false,
+        tension: 0.7,
+        borderWidth: 1,
+        yaxisID: "y",
+      };
 
-    for (let i = 0; i < apparentHighTemps.length; i++) {
-      combinedApparentData.push({
-        x: i * 2 + 1,
-        y: apparentHighTemps[i],
-      });
-      combinedApparentData.push({
-        x: i * 2 + 2,
-        y: apparentLowTemps[i],
-      });
-    }
+      const datasets = [temperatureDataset];
 
-    const apparentDataset = {
-      label: `Apparent Temperature`,
-      data: combinedApparentData,
-      backgroundColor: color,
-      borderColor: color,
-      fill: false,
-      tension: 0.5,
-      borderWidth: 0.5,
-      borderDash: [10, 5],
-      yaxisID: "y1", // Associate with the new y-axis
-    };
+      // Conditionally include apparent temperature data
+      if (includeApparentTemperatures) {
+        const apparentHighTemps = locationData.apparent_high_temperature || [];
+        const apparentLowTemps = locationData.apparent_low_temperature || [];
+        const combinedApparentData: { x: number; y: any }[] = [];
 
-    return [temperatureDataset, apparentDataset]; // Combine this with the actual temperature datasets as needed
-  });
+        for (let i = 0; i < apparentHighTemps.length; i++) {
+          combinedApparentData.push({ x: i * 2 + 1, y: apparentHighTemps[i] });
+          combinedApparentData.push({ x: i * 2 + 2, y: apparentLowTemps[i] });
+        }
+
+        const apparentDataset = {
+          label: `Apparent Temperature`,
+          data: combinedApparentData,
+          backgroundColor: color,
+          borderColor: color,
+          fill: false,
+          tension: 0.5,
+          borderWidth: 0.5,
+          borderDash: [10, 5],
+          yaxisID: "y1",
+        };
+
+        datasets.push(apparentDataset);
+      }
+
+      return datasets;
+    });
+  }, [aggregatedData, visibleRange]);
 
   const debouncedSetVisibleRange = useCallback(
     debounce((min, max) => {
@@ -136,6 +137,11 @@ const HistoricalChart = ({
   useEffect(() => {
     console.log(visibleRange);
   }, [visibleRange]);
+
+  useEffect(() => {
+    // Reset visible range when the component mounts
+    setVisibleRange({ min: 0, max: 365 * 2 });
+  }, []); // Empty dependency array means this runs once on mount
 
   // // Zoom functions
   // const zoomIn = () => {
@@ -157,6 +163,9 @@ const HistoricalChart = ({
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      animation: {
+        duration: 100, // Animation duration
+      },
       plugins: {
         extendedValuesPlugin,
         legend: {
